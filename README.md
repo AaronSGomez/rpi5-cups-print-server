@@ -252,6 +252,15 @@ server_print/
 
 ---
 
+## 👤 Autor
+
+**Aarón Gómez**  
+- 🌐 **Portfolio Web:** [aaronsgomez.es](https://aaronsgomez.es)  
+- 💼 **LinkedIn:** [linkedin.com/in/aaronsgomez](https://www.linkedin.com/in/aaronsgomez/)  
+- 🐙 **GitHub:** [@AaronSGomez](https://github.com/AaronSGomez)  
+
+---
+
 ## 📄 Licencia
 
 Este proyecto se distribuye bajo la licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
