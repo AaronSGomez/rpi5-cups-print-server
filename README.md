@@ -1,4 +1,4 @@
-# 🖨️ Raspberry Pi 5 Centralized Print Server & HP LaserJet Automation
+# Raspberry Pi 5 Centralized Print Server & HP LaserJet Automation
 
 [![Platform](https://img.shields.io/badge/Platform-Raspberry_Pi_5_(ARM64)-C51A4A?style=for-the-badge&logo=raspberrypi&logoColor=white)](https://www.raspberrypi.com)
 [![OS](https://img.shields.io/badge/Debian-13_(Trixie)-D70A53?style=for-the-badge&logo=debian&logoColor=white)](https://www.debian.org)
@@ -16,19 +16,19 @@
 
 ---
 
-## 📖 Documentación y Guías Rápidas del Proyecto
+## Documentación y Guías Rápidas del Proyecto
 
 | Recurso | Enlace Directo | Destinado a | Descripción |
 | :--- | :--- | :--- | :--- |
-| **🌐 Portal Web Interactivo (Online)** | [**aronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: topología interactiva, buscador de drivers multimarca y emulador de consola |
-| **📱 Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
-| **💻 Cliente Windows Click & Play** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador portátil en 1 clic para configurar PCs y portátiles del hogar sin introducir contraseñas |
-| **🚀 Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |
-| **🔧 CLI de Control Remoto** | [`deploy_remote.py`](deploy_remote.py) | PC Administrador | Monitoreo de salud (`--status`), reconfiguración (`--fix-ppd`) y páginas de prueba remotas |
+| **Portal Web Interactivo (Online)** | [**aronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: topología interactiva, buscador de drivers multimarca y emulador de consola |
+| **Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
+| **Cliente Windows Click & Play** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador portátil en 1 clic para configurar PCs y portátiles del hogar sin introducir contraseñas |
+| **Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |
+| **CLI de Control Remoto** | [`deploy_remote.py`](deploy_remote.py) | PC Administrador | Monitoreo de salud (`--status`), reconfiguración (`--fix-ppd`) y páginas de prueba remotas |
 
 ---
 
-## 🌐 Especificaciones del Entorno y Puertos de Servicio
+## Especificaciones del Entorno y Puertos de Servicio
 
 | Componente | Versión / Detalle | Protocolo / Puerto | Función Principal |
 | :--- | :--- | :---: | :--- |
@@ -41,21 +41,21 @@
 
 ---
 
-## ✨ Características Principales
+## Características Principales
 
-### 📱 1. Descubrimiento Nativo Zero-Config (Móviles Android & iOS)
+### 1. Descubrimiento Nativo Zero-Config (Móviles Android & iOS)
 - Anuncio automático vía **mDNS / DNS-SD** (`_ipp._tcp`, `_pdl-datastream._tcp`).
 - Compatible de forma transparente con el **Servicio de Impresión Predeterminado de Android** y la suite **Mopria Print Service** sin requerir drivers ni apps propietarias.
 - Soporte para **Apple AirPrint** (iOS / iPadOS / macOS) sin configuración manual.
 - Guía de contingencia para redes Wi-Fi con aislamiento de punto de acceso (**AP Isolation / Multicast Filtering**).
 
-### 💻 2. Instalador de Cliente Windows "Click & Play"
+### 2. Instalador de Cliente Windows "Click & Play"
 - Paquete portátil e independiente en [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/):
   - **`INSTALAR_IMPRESORA.bat`**: Lanzador con auto-elevación transparente de Administrador (UAC).
   - **`Instalar_Impresora.ps1`**: Script inteligente en PowerShell que sondea el servidor en la LAN, detecta el mejor controlador instalado (`HP LaserJet M14-M17 PCLmS`, `Microsoft IPP Class Driver` o `Microsoft PCL6 Class Driver`), crea la cola local IPP y envía una página de prueba.
   - **`DESINSTALAR_IMPRESORA.bat`**: Desinstalación limpia en un clic para equipos temporales o invitados.
 
-### 🛡️ 3. Mitigación Hardware del Reposo Profundo y Desbloqueo USB (ipp-usb EBUSY Fix)
+### 3. Mitigación Hardware del Reposo Profundo y Desbloqueo USB (ipp-usb EBUSY Fix)
 - **El Problema 1 (Bloqueo exclusivo USB)**: En distribuciones modernas (Debian 12/13, Ubuntu), el servicio `ipp-usb` intenta reclamar de forma exclusiva el bus USB de la impresora. Al tratarse de un modelo host-based (M14-M17 / M15a), `ipp-usb` bloquea el puerto impidiendo que el controlador HPLIP envíe datos (`Channel write error: Device or resource busy`).
 - **El Problema 2 (Reposo profundo / Standby)**: Tras unos minutos de inactividad, la placa entra en suspensión y CUPS por defecto aplicaría `ErrorPolicy stop-printer`, desactivando permanentemente la cola (`Paused / Filter failed`).
 - **Nuestra Solución Integral Implementada**:
@@ -65,14 +65,14 @@
   4. Regla udev en `/etc/udev/rules.d/99-hp-no-autosuspend.rules` forzando `ATTR{power/control}="on"` y `ATTR{power/autosuspend}="-1"`.
   5. Watchdog y script de desbloqueo rápido (`cupsenable` & `cupsaccept`).
 
-### 🔒 4. Seguridad, Variables en `.env` y Cero Exposición
+### 4. Seguridad, Variables en `.env` y Cero Exposición
 - Todas las credenciales del servidor (`RPI_HOST`, `RPI_USER`, `RPI_PASSWORD`) se gestionan mediante variables de entorno en [.env](.env.example).
 - Configuración estricta en [.gitignore](.gitignore) que bloquea `.env`, credenciales y logs.
 - Herramienta unificada de despliegue y monitoreo remoto [deploy_remote.py](deploy_remote.py) basada en `paramiko`.
 
 ---
 
-## 📐 Topología y Flujo de Comunicación
+## Topología y Flujo de Comunicación
 
 ```mermaid
 flowchart TD
@@ -113,7 +113,7 @@ flowchart TD
 
 ---
 
-## 🚀 Despliegue Rápido del Servidor
+## Despliegue Rápido del Servidor
 
 ### Opción 1: Despliegue Remoto Automatizado (Desde PC Administrador)
 1. Clona el repositorio y copia el archivo de entorno:
@@ -156,7 +156,7 @@ El script se encarga de:
 
 ---
 
-## 💻 Configuración en Clientes Windows (Click & Play)
+## Configuración en Clientes Windows (Click & Play)
 
 Para cualquier equipo Windows 10 o Windows 11 del hogar:
 
@@ -167,18 +167,18 @@ Para cualquier equipo Windows 10 o Windows 11 del hogar:
 
 ---
 
-## 📱 Configuración en Dispositivos Móviles (Android & iOS)
+## Configuración en Dispositivos Móviles (Android & iOS)
 
 > 📘 **Guía detallada con capturas y pasos por app:** Consulta el manual completo en [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md).
 
-### 🤖 1. Android (Detección Automática Zero-Config / Mopria)
+### 1. Android (Detección Automática Zero-Config / Mopria)
 1. Conecta el dispositivo a la red Wi-Fi de la vivienda.
 2. Ve a **Ajustes > Conexiones (o Dispositivos conectados) > Preferencias de conexión > Impresión**.
 3. Activa el **Servicio de impresión predeterminado** (o **Mopria Print Service**).
 4. Al imprimir cualquier documento o foto desde WhatsApp, Chrome o el visor PDF, selecciona:
    `HP_LaserJet_M14_M17 @ tu_usuario`.
 
-### ⚡ 2. Android: Fallback Manual por Dirección IP (Sortear AP Isolation del Router)
+### 2. Android: Fallback Manual por Dirección IP (Sortear AP Isolation del Router)
 Si tu router Wi-Fi tiene activado el *Aislamiento de Clientes (AP Isolation)* y no muestra impresoras mDNS:
 1. En el menú de impresión de Android, pulsa los **3 puntos (menú)** > **Agregar impresora**.
 2. Selecciona **Agregar por dirección IP**.
@@ -186,7 +186,7 @@ Si tu router Wi-Fi tiene activado el *Aislamiento de Clientes (AP Isolation)* y 
    * **Host:** `192.168.1.XXX`
    * **URL IPP Directa:** `http://192.168.1.XXX:631/printers/HP_LaserJet_M14_M17`
 
-### 🍏 3. iPhone y iPad (Apple AirPrint Nativo)
+### 3. iPhone y iPad (Apple AirPrint Nativo)
 Gracias a la difusión DNS-SD de Avahi, iOS detecta la impresora sin apps adicionales:
 1. Conéctate a la red Wi-Fi del hogar.
 2. Abre cualquier archivo > Pulsa **Compartir** > **Imprimir**.
@@ -194,7 +194,7 @@ Gracias a la difusión DNS-SD de Avahi, iOS detecta la impresora sin apps adicio
 
 ---
 
-## 🛠️ Comandos Útiles y Diagnóstico
+## Comandos Útiles y Diagnóstico
 
 ### Herramienta CLI `deploy_remote.py`
 ```bash
@@ -224,7 +224,7 @@ python deploy_remote.py --unstick
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 server_print/
@@ -252,15 +252,15 @@ server_print/
 
 ---
 
-## 👤 Autor
+## Autor
 
 **Aarón Gómez**  
-- 🌐 **Portfolio Web:** [aaronsgomez.es](https://aaronsgomez.es)  
-- 💼 **LinkedIn:** [linkedin.com/in/aaronsgomez](https://www.linkedin.com/in/aaronsgomez/)  
-- 🐙 **GitHub:** [@AaronSGomez](https://github.com/AaronSGomez)  
+- 🏴‍☠️ **Portfolio:** [aaronsgomez.es](https://aaronsgomez.es)  
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/aaronsgomez/)  
+- [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/AaronSGomez)  
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto se distribuye bajo la licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.

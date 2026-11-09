@@ -921,3 +921,31 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Iconografía Oficial SVG y Bandera Pirata */
+.tab-svg-icon, .footer-svg-icon, .btn-svg-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.tab-svg-icon {
+    margin-right: 0.6rem;
+}
+
+.footer-svg-icon {
+    margin-right: 0.5rem;
+}
+
+.pirate-flag-symbol {
+    font-size: 1.15rem;
+    margin-right: 0.4rem;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.footer-link-list a {
+    display: inline-flex;
+    align-items: center;
+}
