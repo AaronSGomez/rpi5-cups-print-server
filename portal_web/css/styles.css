@@ -1,0 +1,909 @@
+/* =============================================================================
+   PRINT//CORE 5 — SISTEMA DE DISEÑO EDITORIAL INDUSTRIAL
+   Arquitectura visual, tipografía suiza y precisión técnica
+   ============================================================================= */
+
+:root {
+    /* Paleta Cromática "Technical Warm Paper" */
+    --bg-primary: #FAF8F5;
+    --bg-secondary: #F0EDE6;
+    --bg-surface: #FFFFFF;
+    --bg-code: #141519;
+    
+    --ink-primary: #121316;
+    --ink-secondary: #4A4D55;
+    --ink-muted: #7A7E89;
+    --ink-inverse: #FAF8F5;
+    
+    --accent-vermilion: #FF441A;
+    --accent-vermilion-hover: #E0350D;
+    --accent-amber: #F09A1A;
+    --accent-green: #10B981;
+    --accent-blue: #0284C7;
+    
+    --border-strong: #121316;
+    --border-subtle: #DFD9CE;
+    --border-grid: rgba(18, 19, 22, 0.08);
+    
+    /* Tipografías */
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    /* Retícula y Espaciado */
+    --grid-unit: 8px;
+    --radius-none: 0px;
+    --radius-sm: 2px;
+    --radius-md: 4px;
+    
+    --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+    --bg-primary: #0C0D10;
+    --bg-secondary: #14161B;
+    --bg-surface: #191B22;
+    --bg-code: #070709;
+    
+    --ink-primary: #F4F3EF;
+    --ink-secondary: #A6AAB5;
+    --ink-muted: #6B7080;
+    --ink-inverse: #0C0D10;
+    
+    --border-strong: #F4F3EF;
+    --border-subtle: #272B36;
+    --border-grid: rgba(244, 243, 239, 0.06);
+}
+
+/* -----------------------------------------------------------------------------
+   RESET & BASE
+   ----------------------------------------------------------------------------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--ink-primary);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image: 
+        linear-gradient(var(--border-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -1px -1px;
+}
+
+/* -----------------------------------------------------------------------------
+   BARRA TÉCNICA SUPERIOR (MASTHEAD)
+   ----------------------------------------------------------------------------- */
+.masthead-bar {
+    background: var(--bg-surface);
+    border-bottom: 2px solid var(--border-strong);
+    padding: 0.75rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.system-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    animation: pulse-dot 2.5s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.7; }
+}
+
+.brand-logotype {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-primary);
+    text-decoration: none;
+}
+
+.brand-badge {
+    background: var(--accent-vermilion);
+    color: #FFFFFF;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    padding: 0.15rem 0.45rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border-radius: var(--radius-sm);
+}
+
+.masthead-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.nav-anchor-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+}
+
+.nav-anchor-links a {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.nav-anchor-links a:hover {
+    color: var(--accent-vermilion);
+}
+
+.theme-toggle-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-strong);
+    padding: 0.35rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+    background: var(--ink-primary);
+    color: var(--ink-inverse);
+}
+
+/* -----------------------------------------------------------------------------
+   HERO / MANIFIESTO EDITORIAL
+   ----------------------------------------------------------------------------- */
+.hero-editorial {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 4rem 2rem 3rem;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3.5rem;
+    align-items: start;
+    border-bottom: 2px solid var(--border-strong);
+}
+
+.hero-main-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 5.5vw, 4.75rem);
+    font-weight: 900;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.75rem;
+    text-transform: uppercase;
+}
+
+.hero-main-title span.vermilion-highlight {
+    color: var(--accent-vermilion);
+    display: inline-block;
+}
+
+.hero-abstract {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--ink-secondary);
+    max-width: 48ch;
+    margin-bottom: 2.25rem;
+}
+
+.hero-cta-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-industrial {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border: 2px solid var(--border-strong);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-primary-vermilion {
+    background: var(--accent-vermilion);
+    color: #FFFFFF;
+    border-color: var(--accent-vermilion);
+}
+
+.btn-primary-vermilion:hover {
+    background: var(--accent-vermilion-hover);
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 var(--border-strong);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--ink-primary);
+}
+
+.btn-outline:hover {
+    background: var(--ink-primary);
+    color: var(--ink-inverse);
+    transform: translateY(-2px);
+}
+
+/* Panel de Telemetría Lateral */
+.telemetry-board {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    padding: 1.75rem;
+    box-shadow: 6px 6px 0 var(--border-strong);
+}
+
+.telemetry-board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--border-subtle);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+}
+
+.telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+.telemetry-label {
+    color: var(--ink-secondary);
+}
+
+.telemetry-value {
+    font-weight: 700;
+    color: var(--ink-primary);
+}
+
+.telemetry-value.accent-green {
+    color: var(--accent-green);
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIONES EDITORIALES GENERALES
+   ----------------------------------------------------------------------------- */
+.section-wrapper {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+    border-bottom: 1px solid var(--border-strong);
+}
+
+.section-editorial-header {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    margin-bottom: 3.5rem;
+    align-items: baseline;
+}
+
+.section-numeral {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--accent-vermilion);
+    letter-spacing: -0.02em;
+}
+
+.section-heading-text h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.section-heading-text p {
+    font-size: 1.1rem;
+    color: var(--ink-secondary);
+    max-width: 60ch;
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIÓN 01 — ARQUITECTURA TÉCNICA Y DIAGRAMA
+   ----------------------------------------------------------------------------- */
+.topology-interactive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+}
+
+.diagram-blueprint {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    padding: 2rem;
+    position: relative;
+    box-shadow: 6px 6px 0 var(--border-strong);
+}
+
+.blueprint-node {
+    border: 1px solid var(--border-strong);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    background: var(--bg-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.blueprint-node.active, .blueprint-node:hover {
+    border-color: var(--accent-vermilion);
+    background: var(--bg-surface);
+    transform: translateX(4px);
+    box-shadow: -4px 0 0 var(--accent-vermilion);
+}
+
+.blueprint-node-title {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.blueprint-node-desc {
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+    margin-top: 0.35rem;
+}
+
+.node-details-inspector {
+    background: var(--bg-code);
+    color: #F4F3EF;
+    border: 2px solid var(--border-strong);
+    padding: 2rem;
+    font-family: var(--font-mono);
+    min-height: 380px;
+    box-shadow: 6px 6px 0 var(--border-strong);
+}
+
+.inspector-tag {
+    color: var(--accent-vermilion);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.inspector-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #FFFFFF;
+}
+
+.inspector-content {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #C2C6D1;
+}
+
+.inspector-specs {
+    margin-top: 1.5rem;
+    border-top: 1px dashed #343844;
+    padding-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+}
+
+.inspector-specs-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIÓN 02 — PASO A PASO & REPLICACIÓN
+   ----------------------------------------------------------------------------- */
+.replication-steps-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.step-card {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform var(--transition-fast);
+}
+
+.step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 4px 0 var(--border-strong);
+}
+
+.step-card-header {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.step-number {
+    font-family: var(--font-mono);
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: var(--accent-vermilion);
+    line-height: 1;
+}
+
+.step-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.step-body {
+    font-size: 0.95rem;
+    color: var(--ink-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.step-code-snippet {
+    background: var(--bg-code);
+    color: #F0EDE6;
+    padding: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border-left: 3px solid var(--accent-vermilion);
+    overflow-x: auto;
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIÓN 03 — MOTOR DE BÚSQUEDA DE DRIVERS
+   ----------------------------------------------------------------------------- */
+.driver-search-toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.driver-search-input {
+    flex: 1;
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    padding: 1rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--ink-primary);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.driver-search-input:focus {
+    border-color: var(--accent-vermilion);
+}
+
+.driver-brand-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.brand-chip {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.brand-chip.active, .brand-chip:hover {
+    background: var(--ink-primary);
+    color: var(--ink-inverse);
+}
+
+.drivers-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem;
+}
+
+.driver-result-card {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.driver-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.driver-brand-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-vermilion);
+    text-transform: uppercase;
+}
+
+.driver-model-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.driver-packages-tag {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    background: var(--bg-secondary);
+    padding: 0.3rem 0.6rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.driver-quirks-list {
+    list-style: square;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+}
+
+.driver-command-box {
+    background: var(--bg-code);
+    color: #F4F3EF;
+    padding: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    word-break: break-all;
+}
+
+.copy-cmd-btn {
+    background: var(--accent-vermilion);
+    color: #FFFFFF;
+    border: none;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.copy-cmd-btn:hover {
+    background: var(--accent-vermilion-hover);
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIÓN 04 — CLIENTES WINDOWS & MÓVIL
+   ----------------------------------------------------------------------------- */
+.os-tabs-header {
+    display: flex;
+    border-bottom: 2px solid var(--border-strong);
+    margin-bottom: 2.5rem;
+}
+
+.os-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 4px solid transparent;
+    padding: 1rem 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--ink-muted);
+    transition: all var(--transition-fast);
+}
+
+.os-tab-btn.active {
+    color: var(--ink-primary);
+    border-bottom-color: var(--accent-vermilion);
+}
+
+.os-tab-content-panel {
+    display: none;
+}
+
+.os-tab-content-panel.active {
+    display: block;
+}
+
+.client-guide-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.client-instruction-box {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    padding: 2.25rem;
+}
+
+.client-instruction-box h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.instruction-steps-list {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.instruction-steps-list strong {
+    color: var(--ink-primary);
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIÓN 05 — CONSOLA DE DIAGNÓSTICO INTERACTIVA
+   ----------------------------------------------------------------------------- */
+.terminal-window {
+    background: #0D0E12;
+    border: 2px solid var(--border-strong);
+    box-shadow: 8px 8px 0 var(--border-strong);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.terminal-header {
+    background: #181A20;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2B2F3B;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4B5060;
+}
+
+.terminal-dot.close { background: #EF4444; }
+.terminal-dot.min { background: #F59E0B; }
+.terminal-dot.max { background: #10B981; }
+
+.terminal-title-text {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    letter-spacing: 0.05em;
+}
+
+.terminal-quick-cmds {
+    background: #14161C;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #2B2F3B;
+}
+
+.term-cmd-btn {
+    background: #20242D;
+    color: #E5E7EB;
+    border: 1px solid #374151;
+    padding: 0.3rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.term-cmd-btn:hover {
+    background: var(--accent-vermilion);
+    border-color: var(--accent-vermilion);
+    color: #FFFFFF;
+}
+
+.terminal-body {
+    padding: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: #E2E8F0;
+    min-height: 280px;
+    max-height: 460px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.terminal-prompt-line {
+    color: #10B981;
+    margin-bottom: 0.75rem;
+}
+
+.terminal-output-block {
+    color: #CBD5E1;
+    white-space: pre-wrap;
+    margin-bottom: 1.5rem;
+}
+
+/* -----------------------------------------------------------------------------
+   FOOTER / COLOFÓN
+   ----------------------------------------------------------------------------- */
+.colophon-footer {
+    background: var(--bg-surface);
+    border-top: 2px solid var(--border-strong);
+    padding: 4rem 2rem 3rem;
+}
+
+.footer-inner-grid {
+    max-width: 1360px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 4rem;
+}
+
+.footer-colophon-text {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--ink-secondary);
+    max-width: 48ch;
+}
+
+.footer-col-title {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    color: var(--ink-primary);
+}
+
+.footer-link-list {
+    list-style: none;
+}
+
+.footer-link-list li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-link-list a {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.footer-link-list a:hover {
+    color: var(--accent-vermilion);
+}
+
+/* -----------------------------------------------------------------------------
+   RESPONSIVE DESIGN
+   ----------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+    .hero-editorial {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    
+    .topology-interactive-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .replication-steps-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .client-guide-split {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-inner-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .masthead-bar {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    
+    .nav-anchor-links {
+        display: none;
+    }
+    
+    .section-editorial-header {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .drivers-results-grid {
+        grid-template-columns: 1fr;
+    }
+}

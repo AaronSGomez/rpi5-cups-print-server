@@ -19,6 +19,7 @@
 
 | Recurso | Enlace Directo | Destinado a | Descripción |
 | :--- | :--- | :--- | :--- |
+| **🌐 Portal Web Interactivo** | [**portal_web/**](portal_web/) | Administradores y Usuarios | Interfaz visual interactiva: topología, buscador de drivers multimarca y consola interactiva |
 | **📱 Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
 | **💻 Cliente Windows Click & Play** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador portátil en 1 clic para configurar PCs y portátiles del hogar sin introducir contraseñas |
 | **🚀 Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRINT//CORE 5 — Servidor de Impresión Local & Automatización de Red</title>
+    <meta name="description" content="Manual de arquitectura industrial, replicación y orquestación de servidor de impresión CUPS, Avahi y Samba sobre Raspberry Pi 5.">
+    
+    <!-- Tipografía Editorial Suizo-Industrial -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Hoja de Estilos del Sistema -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- -----------------------------------------------------------------------
+         MASTHEAD / BARRA TÉCNICA
+         ----------------------------------------------------------------------- -->
+    <header class="masthead-bar">
+        <div class="system-status-indicator">
+            <span class="status-dot"></span>
+            <span>SYSTEM ONLINE // BCM2712 ARM64 // CUPS 2.4.10 // PORT 631</span>
+        </div>
+
+        <div class="masthead-controls">
+            <ul class="nav-anchor-links">
+                <li><a href="#arquitectura">01. ARQUITECTURA</a></li>
+                <li><a href="#replicacion">02. REPLICACIÓN</a></li>
+                <li><a href="#drivers">03. DRIVERS & MODELOS</a></li>
+                <li><a href="#clientes">04. CLIENTES & MÓVIL</a></li>
+                <li><a href="#terminal">05. TERMINAL LAB</a></li>
+            </ul>
+
+            <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Cambiar tema visual">[ DARK THEME ]</button>
+        </div>
+    </header>
+
+    <!-- -----------------------------------------------------------------------
+         HERO / MANIFIESTO EDITORIAL
+         ----------------------------------------------------------------------- -->
+    <section class="hero-editorial">
+        <div class="hero-left-column">
+            <a href="#" class="brand-logotype">
+                PRINT//CORE 5
+                <span class="brand-badge">SISTEMA LOCAL</span>
+            </a>
+
+            <h1 class="hero-main-title">
+                CERO DRIVERS PROPIETARIOS.<br>
+                <span class="vermilion-highlight">IMPRESIÓN SOBERANA</span><br>
+                EN TU RED LOCAL.
+            </h1>
+
+            <p class="hero-abstract">
+                Arquitectura de ingeniería local para transformar una <strong>Raspberry Pi 5 (8GB ARM64 / Debian Linux)</strong> en un nodo de impresión centralizado y de alta disponibilidad. Detección nativa sin controladores en <strong>Android (Mopria)</strong>, <strong>iOS (AirPrint)</strong> e integración <strong>Click & Play</strong> para equipos <strong>Windows 10/11</strong>.
+            </p>
+
+            <div class="hero-cta-group">
+                <a href="#replicacion" class="btn-industrial btn-primary-vermilion">
+                    <span>⚡ GUÍA DE REPLICACIÓN</span>
+                    <span style="font-family: var(--font-mono);">&rarr;</span>
+                </a>
+                <a href="#drivers" class="btn-industrial btn-outline">
+                    <span>🔍 BUSCADOR DE DRIVERS</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Telemetría en Vivo -->
+        <div class="telemetry-board">
+            <div class="telemetry-board-header">
+                <span>ESTADO DEL NODO HARDWARE</span>
+                <span>TELEMETRÍA // LIVE</span>
+            </div>
+
+            <div class="telemetry-row">
+                <span class="telemetry-label">Host de Red:</span>
+                <span class="telemetry-value">Raspberry Pi 5 (ARM64)</span>
+            </div>
+            <div class="telemetry-row">
+                <span class="telemetry-label">Sistema Operativo:</span>
+                <span class="telemetry-value">Debian 13 (Trixie) Linux 6.18</span>
+            </div>
+            <div class="telemetry-row">
+                <span class="telemetry-label">Dispositivo USB:</span>
+                <span class="telemetry-value">HP LaserJet M14-M17 (03f0:be2a)</span>
+            </div>
+            <div class="telemetry-row">
+                <span class="telemetry-label">Daemon ipp-usb:</span>
+                <span class="telemetry-value accent-green">ENMASCARADO (Sin conflicto EBUSY)</span>
+            </div>
+            <div class="telemetry-row">
+                <span class="telemetry-label">Política de Reposo:</span>
+                <span class="telemetry-value accent-green">ErrorPolicy: retry-job</span>
+            </div>
+            <div class="telemetry-row">
+                <span class="telemetry-label">Subred Autorizada:</span>
+                <span class="telemetry-value">192.168.0.0/16 (Allow @LOCAL)</span>
+            </div>
+            <div class="telemetry-row" style="border-bottom: none;">
+                <span class="telemetry-label">Broadcast mDNS:</span>
+                <span class="telemetry-value accent-green">_ipp._tcp.local / Avahi ON</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         SECCIÓN 01: ARQUITECTURA TÉCNICA & TOPOLOGÍA
+         ----------------------------------------------------------------------- -->
+    <section id="arquitectura" class="section-wrapper">
+        <div class="section-editorial-header">
+            <div class="section-numeral">01 // TOPOLOGY</div>
+            <div class="section-heading-text">
+                <h2>Arquitectura de Hardware y Flujo de Paquetes</h2>
+                <p>
+                    Comprende cómo interactúan las capas físicas USB, el planificador CUPS, la difusión mDNS y los clientes autorizados de la subred local. Haz clic en cada nodo del diagrama para inspeccionar su configuración.
+                </p>
+            </div>
+        </div>
+
+        <div class="topology-interactive-grid">
+            <div class="diagram-blueprint">
+                <div class="blueprint-node active" data-node="cups">
+                    <div class="blueprint-node-title">
+                        <span>[ NODO 01 ] CUPS 2.4.X SPOOLER</span>
+                        <span style="color: var(--accent-vermilion);">&bull; :631</span>
+                    </div>
+                    <div class="blueprint-node-desc">Planificador central, renderizado PPD y protocolo IPP Everywhere.</div>
+                </div>
+
+                <div class="blueprint-node" data-node="usb">
+                    <div class="blueprint-node-title">
+                        <span>[ NODO 02 ] BUS USB & UDEV KERNEL</span>
+                        <span style="color: var(--accent-green);">&bull; 03f0:be2a</span>
+                    </div>
+                    <div class="blueprint-node-desc">Mitigación de autosuspensión y bypass del bloqueo exclusivo ipp-usb.</div>
+                </div>
+
+                <div class="blueprint-node" data-node="avahi">
+                    <div class="blueprint-node-title">
+                        <span>[ NODO 03 ] AVAHI DAEMON (mDNS)</span>
+                        <span style="color: var(--accent-blue);">&bull; :5353 UDP</span>
+                    </div>
+                    <div class="blueprint-node-desc">Difusión DNS-SD para emparejamiento nativo en Android (Mopria) e iOS.</div>
+                </div>
+
+                <div class="blueprint-node" data-node="samba">
+                    <div class="blueprint-node-title">
+                        <span>[ NODO 04 ] SAMBA SMB SUITE</span>
+                        <span style="color: var(--accent-amber);">&bull; :445 TCP</span>
+                    </div>
+                    <div class="blueprint-node-desc">Compatibilidad Windows Point-and-Print y colas de red RAW clásicas.</div>
+                </div>
+
+                <div class="blueprint-node" data-node="firewall">
+                    <div class="blueprint-node-title">
+                        <span>[ NODO 05 ] FIREWALL UFW PERIMETRAL</span>
+                        <span style="color: #EF4444;">&bull; REGLAS LAN</span>
+                    </div>
+                    <div class="blueprint-node-desc">Aislamiento y acceso estricto a subredes privadas (192.168.0.0/16).</div>
+                </div>
+            </div>
+
+            <!-- Panel Inspector -->
+            <div class="node-details-inspector">
+                <div class="inspector-tag" id="inspector-tag">NÚCLEO DE IMPRESIÓN // PUERTO 631</div>
+                <h3 class="inspector-title" id="inspector-title">CUPS 2.4.x (Common UNIX Printing System)</h3>
+                <p class="inspector-content" id="inspector-content">
+                    Servidor de colas centralizado con protocolo IPP/2.1. Escucha en todas las interfaces de red locales (Port 631) permitiendo a clientes Windows, Linux y Android enviar trabajos crudos (RAW), PWG-Raster o PCLmS sin autenticación restrictiva mediante directivas 'Allow @LOCAL'.
+                </p>
+                <div class="inspector-specs" id="inspector-specs">
+                    <div class="inspector-specs-item">
+                        <span class="spec-label">Directorio Conf:</span>
+                        <span class="spec-value">/etc/cups/cupsd.conf</span>
+                    </div>
+                    <div class="inspector-specs-item">
+                        <span class="spec-label">Política de Error:</span>
+                        <span class="spec-value">ErrorPolicy retry-job</span>
+                    </div>
+                    <div class="inspector-specs-item">
+                        <span class="spec-label">Servicio Systemd:</span>
+                        <span class="spec-value">cups.service (active)</span>
+                    </div>
+                    <div class="inspector-specs-item">
+                        <span class="spec-label">Sockets:</span>
+                        <span class="spec-value">0.0.0.0:631 & [::]:631</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         SECCIÓN 02: GUÍA DE REPLICACIÓN PASO A PASO
+         ----------------------------------------------------------------------- -->
+    <section id="replicacion" class="section-wrapper">
+        <div class="section-editorial-header">
+            <div class="section-numeral">02 // REPLICATION</div>
+            <div class="section-heading-text">
+                <h2>Cómo Replicar el Servidor en Otra Raspberry Pi</h2>
+                <p>
+                    Proceso de aprovisionamiento automatizado, idempotente y con tolerancia a fallos. Diseñado para ejecutarse en menos de 5 minutos sobre cualquier placa Raspberry Pi con arquitectura ARM64.
+                </p>
+            </div>
+        </div>
+
+        <div class="replication-steps-container">
+            <!-- Paso 1 -->
+            <div class="step-card">
+                <div>
+                    <div class="step-card-header">
+                        <div class="step-number">01</div>
+                        <h3 class="step-title">Preparación del Host</h3>
+                    </div>
+                    <p class="step-body">
+                        Instala Raspberry Pi OS (64-bit) o Debian 12/13. Conéctate vía SSH, clona el repositorio y define tus credenciales privadas en el archivo de entorno seguro.
+                    </p>
+                </div>
+                <div class="step-code-snippet">
+                    git clone https://github.com/AaronSGomez/rpi5-cups-print-server.git<br>
+                    cd rpi5-cups-print-server<br>
+                    cp .env.example .env
+                </div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="step-card">
+                <div>
+                    <div class="step-card-header">
+                        <div class="step-number">02</div>
+                        <h3 class="step-title">Ejecución Automatizada</h3>
+                    </div>
+                    <p class="step-body">
+                        Ejecuta el script modular con privilegios root. Instalará CUPS, HPLIP, Avahi, Samba, configurará udev y enmascarará <code>ipp-usb</code> para evitar colisiones.
+                    </p>
+                </div>
+                <div class="step-code-snippet">
+                    # Despliegue en 1 solo comando:<br>
+                    sudo bash setup_cups_server.sh
+                </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="step-card">
+                <div>
+                    <div class="step-card-header">
+                        <div class="step-number">03</div>
+                        <h3 class="step-title">Verificación & Test Físico</h3>
+                    </div>
+                    <p class="step-body">
+                        Comprueba que el planificador esté activo y la cola no esté pausada. Lanza una página de prueba directa al dispositivo USB por línea de comandos.
+                    </p>
+                </div>
+                <div class="step-code-snippet">
+                    lpstat -p -d -v<br>
+                    echo 'Prueba Raspberry Pi' | lp -d HP_LaserJet_M14_M17
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         SECCIÓN 03: MOTOR DE BÚSQUEDA DE DRIVERS & OTROS MODELOS
+         ----------------------------------------------------------------------- -->
+    <section id="drivers" class="section-wrapper">
+        <div class="section-editorial-header">
+            <div class="section-numeral">03 // DRIVERS DB</div>
+            <div class="section-heading-text">
+                <h2>Agregar Otros Modelos & Búsqueda de Controladores</h2>
+                <p>
+                    Catálogo técnico de paquetes y controladores compatibles con Linux ARM64 para impresoras HP, Brother, Canon, Epson, Samsung y modelos modernos IPP Everywhere.
+                </p>
+            </div>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="driver-search-toolbar">
+            <input type="text" id="driver-search-input" class="driver-search-input" placeholder="🔍 Escribe tu modelo de impresora (ej. 'M15', 'Brother 2300', 'EcoTank', 'Gutenprint')...">
+        </div>
+
+        <div class="driver-brand-filters">
+            <button class="brand-chip active" data-brand="ALL">TODAS LAS MARCAS</button>
+            <button class="brand-chip" data-brand="HP">HP (HPLIP / FOO2ZJS)</button>
+            <button class="brand-chip" data-brand="Brother">BROTHER (BRLASER)</button>
+            <button class="brand-chip" data-brand="Epson">EPSON (ESC/P-R)</button>
+            <button class="brand-chip" data-brand="Canon">CANON (GUTENPRINT)</button>
+            <button class="brand-chip" data-brand="Samsung">SAMSUNG (SPLIX)</button>
+            <button class="brand-chip" data-brand="Estándar Universal">UNIVERSAL IPP EVERYWHERE</button>
+        </div>
+
+        <!-- Resultados Generados Dinámicamente -->
+        <div class="drivers-results-grid" id="drivers-results-grid">
+            <!-- Inyectado por app.js a partir de drivers_data.js -->
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         SECCIÓN 04: CLIENTES WINDOWS & MÓVIL
+         ----------------------------------------------------------------------- -->
+    <section id="clientes" class="section-wrapper">
+        <div class="section-editorial-header">
+            <div class="section-numeral">04 // CLIENTS</div>
+            <div class="section-heading-text">
+                <h2>Integración en Equipos del Hogar</h2>
+                <p>
+                    Despliegue sin fricción: paquetes ejecutables con auto-elevación para ordenadores Windows y configuración nativa sin apps en teléfonos Android e iOS.
+                </p>
+            </div>
+        </div>
+
+        <!-- Pestañas de SO -->
+        <div class="os-tabs-header">
+            <button class="os-tab-btn active" data-tab="tab-windows">💻 WINDOWS 10 / 11 (CLICK & PLAY)</button>
+            <button class="os-tab-btn" data-tab="tab-android">📱 ANDROID (MOPRIA / IP DIRECTA)</button>
+            <button class="os-tab-btn" data-tab="tab-ios">🍏 APPLE (AIRPRINT ZERO-CONFIG)</button>
+        </div>
+
+        <!-- Panel Windows -->
+        <div class="os-tab-content-panel active" id="tab-windows">
+            <div class="client-guide-split">
+                <div class="client-instruction-box">
+                    <h3>Instalación en 1 Clic (Modo Portátil)</h3>
+                    <p style="color: var(--ink-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                        La carpeta portátil <code>Cliente_Windows_ClickAndPlay</code> contiene un lanzador ejecutable que no requiere conocimientos técnicos ni instalación de software de terceros.
+                    </p>
+                    <ol class="instruction-steps-list">
+                        <li>Copia la carpeta <code>Cliente_Windows_ClickAndPlay</code> en el ordenador deseado.</li>
+                        <li>Haz doble clic sobre <strong><code>INSTALAR_IMPRESORA.bat</code></strong>.</li>
+                        <li>Acepta la elevación de privilegios de Administrador de Windows (UAC).</li>
+                        <li>El script te solicitará la IP local de tu Raspberry Pi, comprobará el puerto 631 y seleccionará el mejor controlador nativo (PCLmS / Microsoft IPP Class).</li>
+                        <li>Pulsa <strong>Enter</strong> para enviar una página de prueba.</li>
+                    </ol>
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-secondary); padding: 0.75rem; border-left: 3px solid var(--accent-vermilion);">
+                        Tip: Si creas un archivo local <code>ip_servidor.txt</code> con tu IP en la carpeta, el instalador no te pedirá la IP y se instalará en modo 100% silencioso.
+                    </div>
+                </div>
+
+                <div class="client-instruction-box">
+                    <h3>Vinculación Manual por Interfaz Gráfica</h3>
+                    <p style="color: var(--ink-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                        Si prefieres añadir la impresora mediante el panel de control estándar de Windows:
+                    </p>
+                    <ol class="instruction-steps-list">
+                        <li>Presiona <code>Win + I</code> y ve a <strong>Bluetooth y dispositivos &gt; Impresoras y escáneres</strong>.</li>
+                        <li>Pulsa en <strong>Agregar dispositivo</strong> y espera 5 segundos hasta que aparezca el enlace azul: <em>"La impresora que deseo no está en la lista"</em>.</li>
+                        <li>Selecciona la opción: <strong>"Seleccionar una impresora compartida por nombre"</strong>.</li>
+                        <li>Escribe la URL del servidor:<br>
+                            <code>http://&lt;IP_RASPBERRY_PI&gt;:631/printers/HP_LaserJet_M14_M17</code>
+                        </li>
+                        <li>En el catálogo de drivers, elige: <strong>HP &gt; HP LaserJet M14-M17 PCLmS</strong> (o Generic PCL6).</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Android -->
+        <div class="os-tab-content-panel" id="tab-android">
+            <div class="client-guide-split">
+                <div class="client-instruction-box">
+                    <h3>Detección Automática (Zero-Config / Mopria)</h3>
+                    <ol class="instruction-steps-list">
+                        <li>Conecta tu teléfono a la red Wi-Fi de la vivienda.</li>
+                        <li>Ve a <strong>Ajustes &gt; Conexiones &gt; Preferencias de conexión &gt; Impresión</strong> <em>(o "Conexión y compartir &gt; Impresión" en Xiaomi)</em>.</li>
+                        <li>Comprueba que el <strong>Servicio de impresión predeterminado</strong> esté <strong>Activado</strong>.</li>
+                        <li>Abre cualquier documento, foto o PDF y pulsa <strong>Imprimir</strong>.</li>
+                        <li>La impresora aparecerá automáticamente como <code>HP_LaserJet_M14_M17 @ raspberrypi</code>.</li>
+                    </ol>
+                </div>
+
+                <div class="client-instruction-box">
+                    <h3>Conexión Manual por IP (Bypass de Aislamiento Wi-Fi)</h3>
+                    <p style="color: var(--ink-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                        Si tu router tiene activado el <em>AP Isolation (Aislamiento de clientes)</em> y bloquea los paquetes mDNS:
+                    </p>
+                    <ol class="instruction-steps-list">
+                        <li>En <strong>Ajustes &gt; Impresión &gt; Servicio predeterminado</strong>, pulsa el menú de los <strong>3 puntos verticales</strong>.</li>
+                        <li>Selecciona <strong>"Agregar impresora"</strong> &gt; <strong>Por dirección IP</strong>.</li>
+                        <li>Introduce la IP de tu Raspberry Pi o la URL completa:<br>
+                            <code>http://&lt;IP_RASPBERRY_PI&gt;:631/printers/HP_LaserJet_M14_M17</code>
+                        </li>
+                        <li>Pulsa Guardar. Quedará vinculada permanentemente.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel iOS -->
+        <div class="os-tab-content-panel" id="tab-ios">
+            <div class="client-guide-split">
+                <div class="client-instruction-box" style="grid-column: 1 / -1;">
+                    <h3>Apple AirPrint Nativo (iPhone, iPad, Mac)</h3>
+                    <p style="color: var(--ink-secondary); margin-bottom: 1.5rem; font-size: 1rem;">
+                        Gracias a que el demonio <strong>Avahi</strong> de la Raspberry Pi 5 anuncia el protocolo DNS-SD con subtipos <code>_ipp._tcp</code> y perfiles URF/Raster, los dispositivos Apple no necesitan ninguna aplicación de terceros ni configuración:
+                    </p>
+                    <ol class="instruction-steps-list" style="font-size: 1.05rem;">
+                        <li>Conecta el iPhone o iPad a la misma red Wi-Fi.</li>
+                        <li>En cualquier aplicación (Safari, Fotos, WhatsApp, Mail, Archivos), pulsa el botón <strong>Compartir</strong> (icono de cuadrado con flecha).</li>
+                        <li>Toca en <strong>Imprimir</strong>.</li>
+                        <li>En el campo <em>Impresora</em>, verás aparecer instantáneamente <strong>HP_LaserJet_M14_M17</strong>.</li>
+                        <li>Selecciona el número de copias y pulsa <strong>Imprimir</strong> en la esquina superior derecha.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         SECCIÓN 05: CONSOLA DE DIAGNÓSTICO INTERACTIVA
+         ----------------------------------------------------------------------- -->
+    <section id="terminal" class="section-wrapper">
+        <div class="section-editorial-header">
+            <div class="section-numeral">05 // TELEMETRY LAB</div>
+            <div class="section-heading-text">
+                <h2>Consola de Diagnóstico & Simulador Terminal</h2>
+                <p>
+                    Ejecuta comandos de inspección en tiempo real para verificar el estado de los dispositivos USB, colas en el planificador CUPS y demonios de red.
+                </p>
+            </div>
+        </div>
+
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-controls">
+                    <span class="terminal-dot close"></span>
+                    <span class="terminal-dot min"></span>
+                    <span class="terminal-dot max"></span>
+                </div>
+                <div class="terminal-title-text">admin@raspberrypi:~ — bash (ARM64 GNU/Linux)</div>
+                <div style="font-family: var(--font-mono); font-size: 0.7rem; color: #10B981;">● SSH CONNECTED</div>
+            </div>
+
+            <!-- Botones de Comandos Rápidos -->
+            <div class="terminal-quick-cmds">
+                <span style="font-family: var(--font-mono); font-size: 0.72rem; color: #9CA3AF; align-self: center;">EJECUTAR:</span>
+                <button class="term-cmd-btn" data-cmd="lpstat -p -d -v">lpstat -p -d -v</button>
+                <button class="term-cmd-btn" data-cmd="driverless">driverless</button>
+                <button class="term-cmd-btn" data-cmd="lsusb">lsusb</button>
+                <button class="term-cmd-btn" data-cmd="sudo hp-probe -b usb">sudo hp-probe -b usb</button>
+                <button class="term-cmd-btn" data-cmd="sudo systemctl status cups avahi-daemon smbd">systemctl status</button>
+                <button class="term-cmd-btn" data-cmd="cups_unstick_queue.sh">cups_unstick_queue.sh</button>
+            </div>
+
+            <!-- Salida Terminal -->
+            <div class="terminal-body" id="terminal-output-container">
+                <div class="terminal-prompt-line">
+                    <span style="color:#60A5FA;">admin@raspberrypi</span>:<span style="color:#FBBF24;">~</span>$ <strong>lpstat -p -d -v</strong>
+                </div>
+                <div class="terminal-output-block">la impresora HP_LaserJet_M14_M17 está inactiva. activada desde lun 09 nov 2026 11:18:28
+destino predeterminado del sistema: HP_LaserJet_M14_M17
+dispositivo para HP_LaserJet_M14_M17: hp:/usb/HP_LaserJet_M14-M17?serial=03F0_BE2A_SER
+dispositivo para PDF: cups-pdf:/
+planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         FOOTER / COLOFÓN EDITORIAL
+         ----------------------------------------------------------------------- -->
+    <footer class="colophon-footer">
+        <div class="footer-inner-grid">
+            <div>
+                <a href="#" class="brand-logotype" style="margin-bottom: 1rem; display: inline-flex;">
+                    PRINT//CORE 5
+                    <span class="brand-badge">OPEN SOURCE</span>
+                </a>
+                <p class="footer-colophon-text">
+                    Sistema de automatización de red e infraestructura de impresión soberana para Raspberry Pi 5 (ARM64). Diseñado con principios de tipografía editorial suiza y rigor de ingeniería en sistemas Linux.
+                </p>
+                <p style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-muted); margin-top: 1.25rem;">
+                    Licencia MIT &bull; Desarrollado por Aarón Gómez &bull; 2026
+                </p>
+            </div>
+
+            <div>
+                <h4 class="footer-col-title">Documentación</h4>
+                <ul class="footer-link-list">
+                    <li><a href="#arquitectura">Arquitectura & Topología</a></li>
+                    <li><a href="#replicacion">Guía de Replicación</a></li>
+                    <li><a href="#drivers">Buscador de Drivers</a></li>
+                    <li><a href="#clientes">Clientes Windows & Móvil</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-col-title">Repositorio</h4>
+                <ul class="footer-link-list">
+                    <li><a href="https://github.com/AaronSGomez/rpi5-cups-print-server" target="_blank" rel="noopener">GitHub Oficial &rarr;</a></li>
+                    <li><a href="https://github.com/AaronSGomez/rpi5-cups-print-server/blob/main/docs/GUIA_IMPRESION_MOVIL.md" target="_blank" rel="noopener">Guía Móvil Markdown</a></li>
+                    <li><a href="https://github.com/AaronSGomez/rpi5-cups-print-server/blob/main/LICENSE" target="_blank" rel="noopener">Licencia MIT</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts del Portal -->
+    <script src="js/drivers_data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
