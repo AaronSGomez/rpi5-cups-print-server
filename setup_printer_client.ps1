@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 =============================================================================
-INSTALADOR DE CLIENTE WINDOWS - IMPRESORA HP LASERJET M14-M17 (CUPS / RPi5)
+INSTALADOR DE CLIENTE WINDOWS - IMPRESORA HP LASERJET M14-M17 (CUPS / RPi)
 setup_printer_client.ps1
 =============================================================================
 Configura automaticamente la impresora de red local sobre IPP/CUPS en
@@ -11,17 +11,16 @@ equipos Windows 10 y Windows 11.
 
 [CmdletBinding()]
 param(
-    [string]$ServerHost = "192.168.1.XXX",
+    [string]$ServerHost = "",
     [int]$ServerPort = 631,
     [string]$QueueName = "HP_LaserJet_M14_M17",
-    [string]$PrinterDisplayName = "HP LaserJet M14-M17 (RPi 5 Server)",
+    [string]$PrinterDisplayName = "HP LaserJet M14-M17 (RPi Server)",
     [switch]$SetAsDefault = $false,
     [switch]$SkipTestPage = $false
 )
 
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host "  CONFIGURACION DE IMPRESORA CLIENTE (WINDOWS 10 / 11)" -ForegroundColor Cyan
-Write-Host "  Servidor CUPS: http://$ServerHost`:$ServerPort/printers/$QueueName" -ForegroundColor Cyan
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -37,7 +36,7 @@ if (-not $isAdmin) {
 }
 
 # -----------------------------------------------------------------------------
-# 2. CARGA DE CONFIGURACION DESDE .env LOCAL (SI EXISTE)
+# 2. CARGA DE CONFIGURACION DESDE .env O ARCHIVO LOCAL
 # -----------------------------------------------------------------------------
 $envPath = Join-Path $PSScriptRoot ".env"
 if (Test-Path $envPath) {
@@ -48,20 +47,39 @@ if (Test-Path $envPath) {
             $parts = $line.Split("=", 2)
             $k = $parts[0].Trim()
             $v = $parts[1].Trim().Trim('"').Trim("'")
-            if ($k -eq "RPI_HOST" -and $v) { $ServerHost = $v }
+            if ($k -eq "RPI_HOST" -and $v -and -not $ServerHost) { $ServerHost = $v }
             if ($k -eq "CUPS_PORT" -and $v) { $ServerPort = [int]$v }
             if ($k -eq "PRINTER_QUEUE_NAME" -and $v) { $QueueName = $v }
         }
     }
 }
 
-$IppUrl = "http://${ServerHost}:${ServerPort}/printers/${QueueName}"
+$ipTxt = Join-Path $PSScriptRoot "ip_servidor.txt"
+if (-not $ServerHost -and (Test-Path $ipTxt)) {
+    $ServerHost = (Get-Content $ipTxt -Raw).Trim()
+}
 
 # -----------------------------------------------------------------------------
-# 3. VERIFICACION DE CONECTIVIDAD CON EL SERVIDOR CUPS
+# 3. VERIFICACION DE IP Y CONECTIVIDAD
 # -----------------------------------------------------------------------------
-Write-Host "[*] Comprobando conectividad con el servidor $ServerHost en el puerto $ServerPort..." -ForegroundColor Cyan
+if (-not $ServerHost) {
+    Write-Host "Introduce la direccion IP local de la Raspberry Pi:" -ForegroundColor Yellow
+    while (-not $ServerHost) {
+        $ServerHost = (Read-Host "Direccion IP").Trim()
+    }
+}
+
+Write-Host "[*] Comprobando conectividad con $ServerHost en el puerto $ServerPort..." -ForegroundColor Cyan
 $testConn = Test-NetConnection -ComputerName $ServerHost -Port $ServerPort -WarningAction SilentlyContinue
+
+if (-not $testConn.TcpTestSucceeded) {
+    Write-Host "[!] No se pudo conectar a $ServerHost en el puerto $ServerPort." -ForegroundColor Yellow
+    $retryIp = (Read-Host "Introduce de nuevo la IP correcta de la Raspberry Pi").Trim()
+    if ($retryIp) {
+        $ServerHost = $retryIp
+        $testConn = Test-NetConnection -ComputerName $ServerHost -Port $ServerPort -WarningAction SilentlyContinue
+    }
+}
 
 if (-not $testConn.TcpTestSucceeded) {
     Write-Host "[X] ERROR: No se puede conectar a $ServerHost en puerto $ServerPort" -ForegroundColor Red
@@ -72,7 +90,9 @@ if (-not $testConn.TcpTestSucceeded) {
     Read-Host "Presione Enter para salir"
     exit 1
 }
-Write-Host "[OK] Conexion establecida con exito con el servidor CUPS." -ForegroundColor Green
+
+$IppUrl = "http://${ServerHost}:${ServerPort}/printers/${QueueName}"
+Write-Host "[OK] Conexion establecida con exito con el servidor CUPS ($IppUrl)." -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
 # 4. SELECCION INTELIGENTE DEL CONTROLADOR (DRIVER)
@@ -132,9 +152,7 @@ catch {
     }
     catch {
         Write-Host "[X] ERROR al registrar la impresora: $_" -ForegroundColor Red
-        Write-Host "    Puede anadirla manualmente en: Configuracion > Impresoras y escaneres > Agregar impresora" -ForegroundColor Yellow
-        Write-Host "    Seleccione 'La impresora no esta en la lista' -> 'Seleccionar una impresora compartida por nombre'" -ForegroundColor Yellow
-        Write-Host "    Pegue la URL: $IppUrl" -ForegroundColor Yellow
+        Read-Host "Presione Enter para salir..."
         exit 1
     }
 }
@@ -153,16 +171,16 @@ if ($SetAsDefault) {
 # -----------------------------------------------------------------------------
 if (-not $SkipTestPage) {
     Write-Host ""
-    $resp = Read-Host "¿Desea enviar una pagina de prueba ahora a la impresora? (S/N) [Por defecto: S]"
+    $resp = Read-Host "Deseas enviar una pagina de prueba ahora? (S/N) [Por defecto: S]"
     if ($resp -eq "" -or $resp.ToUpper().StartsWith("S")) {
-        Write-Host "[*] Enviando pagina de prueba de Windows..." -ForegroundColor Cyan
+        Write-Host "[*] Enviando pagina de prueba al Spooler de impresion..." -ForegroundColor Cyan
         try {
             Start-Process "rundll32.exe" -ArgumentList "printui.dll,PrintUIEntry /k /n `"$PrinterDisplayName`"" -Wait
             Write-Host "[OK] Comando de pagina de prueba enviado al Spooler de Windows." -ForegroundColor Green
         }
         catch {
             Write-Host "[!] Enviando texto directo de prueba..." -ForegroundColor Yellow
-            "Prueba de Impresion Windows -> Servidor RPi5 CUPS - $(Get-Date)" | Out-Printer -Name $PrinterDisplayName
+            "Prueba de Impresion Windows -> Servidor CUPS - $(Get-Date)" | Out-Printer -Name $PrinterDisplayName
         }
     }
 }

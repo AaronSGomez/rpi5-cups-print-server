@@ -4,7 +4,7 @@
 INSTALADOR CLICK & PLAY - CLIENTE WINDOWS 10 / 11
 =============================================================================
 Configura automaticamente la impresora compartida HP LaserJet M14-M17
-desde el servidor Raspberry Pi 5 en cualquier equipo de la red local.
+desde el servidor Raspberry Pi en cualquier equipo de la red local.
 =============================================================================
 #>
 
@@ -18,7 +18,7 @@ param(
 Write-Host ""
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host "       INSTALACION CLICK & PLAY - IMPRESORA RED LOCAL HOGAR          " -ForegroundColor Cyan
-Write-Host "       Modelo: HP LaserJet Pro M14-M17 (Servidor Raspberry Pi 5)     " -ForegroundColor Cyan
+Write-Host "       Modelo: HP LaserJet Pro M14-M17 (Servidor Raspberry Pi)       " -ForegroundColor Cyan
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -33,38 +33,69 @@ if (-not $isAdmin) {
 }
 
 # -----------------------------------------------------------------------------
-# 2. LOCALIZACION DEL SERVIDOR EN LA RED LOCAL
+# 2. DETERMINACION DE LA IP DEL SERVIDOR (AUTOMATICA O MANUAL)
 # -----------------------------------------------------------------------------
-Write-Host "[*] Buscando el servidor de impresion en la red local..." -ForegroundColor Cyan
-
-$candidates = @("192.168.1.XXX", "tu_usuario.local", "raspberrypi.local")
+$ipConfigFile = Join-Path $PSScriptRoot "ip_servidor.txt"
 $activeHost = $null
 
-foreach ($hostCand in $candidates) {
-    Write-Host "    -> Probando $hostCand en puerto $Port... " -NoNewline -ForegroundColor DarkGray
-    $t = Test-NetConnection -ComputerName $hostCand -Port $Port -WarningAction SilentlyContinue
-    if ($t.TcpTestSucceeded) {
-        Write-Host "CONECTADO [OK]" -ForegroundColor Green
-        $activeHost = $hostCand
-        break
-    } else {
-        Write-Host "Sin respuesta" -ForegroundColor DarkYellow
+# A) Comprobar si existe archivo local preconfigurado (ip_servidor.txt)
+if (Test-Path $ipConfigFile) {
+    $fileContent = (Get-Content $ipConfigFile -Raw).Trim()
+    if ($fileContent) {
+        Write-Host "[*] Archivo local ip_servidor.txt detectado: $fileContent" -ForegroundColor Cyan
+        $activeHost = $fileContent
     }
 }
 
+# B) Si no hay archivo o está vacío, solicitar la IP al usuario
 if (-not $activeHost) {
+    Write-Host "=====================================================================" -ForegroundColor Yellow
+    Write-Host "  CONFIGURACION DE RED LOCAL - SERVIDOR DE IMPRESION" -ForegroundColor Yellow
+    Write-Host "=====================================================================" -ForegroundColor Yellow
+    Write-Host "Por favor, introduce la direccion IP local de la Raspberry Pi:" -ForegroundColor White
+    Write-Host "(Ejemplo habitual: 192.168.1.100 o la IP asignada en tu router)" -ForegroundColor DarkGray
     Write-Host ""
-    Write-Host "[X] ERROR: No se ha podido localizar el servidor de impresion en la red." -ForegroundColor Red
+    
+    while (-not $activeHost) {
+        $userInput = (Read-Host "Direccion IP de la Raspberry Pi").Trim()
+        if ($userInput) {
+            $activeHost = $userInput
+        } else {
+            Write-Host "[!] La IP no puede estar vacia. Intentalo de nuevo." -ForegroundColor Red
+        }
+    }
+}
+
+Write-Host ""
+Write-Host "[*] Comprobando conexion con $activeHost en el puerto $Port (CUPS)..." -ForegroundColor Cyan
+$testConn = Test-NetConnection -ComputerName $activeHost -Port $Port -WarningAction SilentlyContinue
+
+if (-not $testConn.TcpTestSucceeded) {
+    Write-Host ""
+    Write-Host "[X] ERROR: No se pudo conectar a $activeHost en el puerto $Port" -ForegroundColor Red
     Write-Host "    1. Comprueba que la Raspberry Pi este encendida y conectada al router." -ForegroundColor Yellow
-    Write-Host "    2. Verifica que este equipo este conectado a la misma red Wi-Fi o cable Ethernet." -ForegroundColor Yellow
+    Write-Host "    2. Verifica que este equipo este en la misma red Wi-Fi o cable Ethernet." -ForegroundColor Yellow
+    Write-Host "    3. Comprueba que la direccion IP introducida sea la correcta." -ForegroundColor Yellow
     Write-Host ""
+    # Si fallo y habia un archivo guardado, borrarlo para que pregunte la proxima vez
+    if (Test-Path $ipConfigFile) {
+        Remove-Item $ipConfigFile -Force -ErrorAction SilentlyContinue
+    }
     Read-Host "Presione Enter para salir..."
     exit 1
 }
 
+# Guardar la IP comprobada en el archivo local para no volver a pedirla en este equipo
+if (-not (Test-Path $ipConfigFile)) {
+    try {
+        Set-Content -Path $ipConfigFile -Value $activeHost -NoNewline
+        Write-Host "[OK] IP memorizada en ip_servidor.txt para proximas ejecuciones." -ForegroundColor DarkGray
+    } catch {}
+}
+
 $IppUrl = "http://${activeHost}:${Port}/printers/${QueueName}"
-Write-Host "[OK] Servidor detectado en: $activeHost" -ForegroundColor Green
-Write-Host "[OK] URL del servicio IPP:   $IppUrl" -ForegroundColor Green
+Write-Host "[OK] Conexion con el servidor CUPS establecida con exito." -ForegroundColor Green
+Write-Host "[OK] URL IPP de destino: $IppUrl" -ForegroundColor Green
 Write-Host ""
 
 # -----------------------------------------------------------------------------
