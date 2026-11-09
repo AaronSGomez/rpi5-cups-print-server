@@ -7,6 +7,7 @@
 [![Avahi](https://img.shields.io/badge/Zero--Config-mDNS_%2F_AirPrint_%2F_Mopria-2496ED?style=for-the-badge)](https://avahi.org)
 [![Samba](https://img.shields.io/badge/File%26Print-Samba_4.x-BA141A?style=for-the-badge&logo=samba&logoColor=white)](https://www.samba.org)
 [![Windows](https://img.shields.io/badge/Clients-Windows_10_%2F_11_Click%26Play-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![GitHub Pages](https://img.shields.io/badge/Live_Portal-GitHub_Pages-22c55e?style=for-the-badge&logo=githubpages&logoColor=white)](https://aaronsgomez.github.io/rpi5-cups-print-server/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 > **Resumen Ejecutivo**:  
@@ -19,7 +20,7 @@
 
 | Recurso | Enlace Directo | Destinado a | Descripción |
 | :--- | :--- | :--- | :--- |
-| **🌐 Portal Web Interactivo** | [**portal_web/**](portal_web/) | Administradores y Usuarios | Interfaz visual interactiva: topología, buscador de drivers multimarca y consola interactiva |
+| **🌐 Portal Web Interactivo (Online)** | [**aronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: topología interactiva, buscador de drivers multimarca y emulador de consola |
 | **📱 Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
 | **💻 Cliente Windows Click & Play** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador portátil en 1 clic para configurar PCs y portátiles del hogar sin introducir contraseñas |
 | **🚀 Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |
