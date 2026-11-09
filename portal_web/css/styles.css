@@ -75,6 +75,9 @@ html {
     scroll-behavior: smooth;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
 }
 
 body {
@@ -83,11 +86,26 @@ body {
     font-family: var(--font-body);
     line-height: 1.6;
     min-height: 100vh;
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+    position: relative;
     background-image: 
         linear-gradient(var(--border-grid) 1px, transparent 1px),
         linear-gradient(90deg, var(--border-grid) 1px, transparent 1px);
     background-size: 40px 40px;
     background-position: -1px -1px;
+}
+
+/* Reglas universales para prevención de desborde horizontal */
+code, pre, kbd {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+
+img, svg {
+    max-width: 100%;
+    height: auto;
 }
 
 /* -----------------------------------------------------------------------------
@@ -875,16 +893,18 @@ body {
 }
 
 /* -----------------------------------------------------------------------------
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN & CONTROL TOTAL DE DESBORDE (MOBILE-FIRST POLISH)
    ----------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
     .hero-editorial {
         grid-template-columns: 1fr;
         gap: 2.5rem;
+        padding: 3.5rem 1.5rem 2.5rem;
     }
     
     .topology-interactive-grid {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
     
     .replication-steps-container {
@@ -896,29 +916,384 @@ body {
     }
     
     .footer-inner-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 2.5rem;
     }
 }
 
 @media (max-width: 768px) {
+    /* Barra técnica superior */
     .masthead-bar {
-        padding: 0.75rem 1rem;
-        flex-wrap: wrap;
-        gap: 0.75rem;
+        padding: 0.6rem 1rem;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .system-status-indicator {
+        font-size: 0.66rem;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        gap: 0.4rem;
+    }
+
+    .system-status-indicator span:last-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .nav-anchor-links {
         display: none;
     }
-    
+
+    .masthead-controls {
+        flex-shrink: 0;
+    }
+
+    .theme-toggle-btn {
+        padding: 0.3rem 0.55rem;
+        font-size: 0.72rem;
+        white-space: nowrap;
+    }
+
+    /* Hero Section */
+    .hero-editorial {
+        padding: 2.25rem 1rem 2rem;
+        gap: 2rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .brand-logotype {
+        font-size: 1.15rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-main-title {
+        font-size: clamp(1.75rem, 8vw, 2.5rem);
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+        margin-bottom: 1.25rem;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .hero-abstract {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+    }
+
+    .hero-cta-group {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 0.75rem;
+    }
+
+    .btn-industrial {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+        padding: 0.85rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Telemetría */
+    .telemetry-board {
+        padding: 1.25rem 1rem;
+        box-shadow: 4px 4px 0 var(--border-strong);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .telemetry-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+        padding: 0.5rem 0;
+        font-size: 0.8rem;
+    }
+
+    .telemetry-value {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    /* Secciones Generales */
+    .section-wrapper {
+        padding: 3rem 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .section-editorial-header {
         grid-template-columns: 1fr;
         gap: 0.5rem;
+        margin-bottom: 2rem;
     }
-    
+
+    .section-numeral {
+        font-size: 1.05rem;
+    }
+
+    .section-heading-text h2 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+
+    .section-heading-text p {
+        font-size: 0.92rem;
+    }
+
+    /* Topología y Blueprint */
+    .topology-interactive-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    .diagram-blueprint, .node-details-inspector {
+        padding: 1.25rem 1rem;
+        box-shadow: 4px 4px 0 var(--border-strong);
+        width: 100%;
+        box-sizing: border-box;
+        min-height: auto;
+    }
+
+    .blueprint-node {
+        padding: 1rem 0.85rem;
+    }
+
+    .blueprint-node-title {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .inspector-title {
+        font-size: 1.15rem;
+    }
+
+    .inspector-specs-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.15rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .spec-value {
+        word-break: break-all;
+        overflow-wrap: anywhere;
+    }
+
+    /* Replicación */
+    .replication-steps-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    .step-card {
+        padding: 1.25rem 1rem;
+        box-shadow: 4px 4px 0 var(--border-strong);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .step-code-snippet {
+        font-size: 0.75rem;
+        padding: 0.65rem;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Buscador de Drivers */
+    .driver-search-toolbar {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .driver-search-input {
+        width: 100%;
+        padding: 0.75rem 0.85rem;
+        font-size: 0.85rem;
+        box-sizing: border-box;
+    }
+
+    .driver-brand-filters {
+        gap: 0.35rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .brand-chip {
+        font-size: 0.72rem;
+        padding: 0.4rem 0.65rem;
+        flex: 1 1 auto;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
     .drivers-results-grid {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
+        width: 100%;
+    }
+
+    .driver-result-card {
+        padding: 1.25rem 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .driver-command-box {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .driver-command-box code {
+        word-break: break-all;
+        overflow-wrap: anywhere;
+    }
+
+    .copy-cmd-btn {
+        width: 100%;
+        text-align: center;
+        padding: 0.45rem 0.5rem;
+        font-size: 0.72rem;
+    }
+
+    /* Pestañas de Sistemas Operativos (Solución Crítica de Overflow) */
+    .os-tabs-header {
+        flex-direction: column;
+        width: 100%;
+        border-bottom: none;
+        gap: 0.4rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .os-tab-btn {
+        width: 100%;
+        text-align: left;
+        padding: 0.8rem 1rem;
+        font-size: 0.82rem;
+        border: 1px solid var(--border-subtle);
+        border-bottom: 2px solid var(--border-subtle);
+        box-sizing: border-box;
+    }
+
+    .os-tab-btn.active {
+        border-color: var(--accent-vermilion);
+        border-bottom: 3px solid var(--accent-vermilion);
+        background: var(--bg-secondary);
+        color: var(--ink-primary);
+    }
+
+    .client-guide-split {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        width: 100%;
+    }
+
+    .client-instruction-box {
+        padding: 1.25rem 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .instruction-steps-list {
+        padding-left: 1.25rem;
+    }
+
+    .instruction-steps-list li {
+        font-size: 0.92rem;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 0.75rem;
+    }
+
+    .instruction-steps-list code {
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        display: inline-block;
+        max-width: 100%;
+        font-size: 0.78rem;
+    }
+
+    /* Consola Terminal Lab */
+    .terminal-window {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .terminal-header {
+        padding: 0.6rem 0.85rem;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .terminal-title-text {
+        font-size: 0.68rem;
+        max-width: 100%;
+        word-break: break-all;
+    }
+
+    .terminal-quick-cmds {
+        padding: 0.5rem 0.75rem;
+        gap: 0.35rem;
+    }
+
+    .term-cmd-btn {
+        font-size: 0.68rem;
+        padding: 0.25rem 0.45rem;
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    .terminal-body {
+        padding: 0.85rem;
+        font-size: 0.72rem;
+        min-height: 220px;
+        max-height: 380px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .terminal-output-block {
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+    }
+
+    /* Footer Colofón */
+    .colophon-footer {
+        padding: 2.5rem 1rem 2rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .footer-inner-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        width: 100%;
+    }
+
+    .footer-colophon-text {
+        max-width: 100%;
     }
 }
 
