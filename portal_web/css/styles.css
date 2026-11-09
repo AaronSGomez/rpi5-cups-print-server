@@ -65,6 +65,11 @@
     padding: 0;
 }
 
+button, input, textarea, select {
+    font-family: inherit;
+    color: inherit;
+}
+
 html {
     font-size: 16px;
     scroll-behavior: smooth;
@@ -175,6 +180,7 @@ body {
 
 .theme-toggle-btn {
     background: var(--bg-secondary);
+    color: var(--ink-primary);
     border: 1px solid var(--border-strong);
     padding: 0.35rem 0.75rem;
     font-family: var(--font-mono);
@@ -548,6 +554,7 @@ body {
 
 .brand-chip {
     background: var(--bg-surface);
+    color: var(--ink-primary);
     border: 1px solid var(--border-strong);
     padding: 0.5rem 1rem;
     font-family: var(--font-mono);
@@ -557,9 +564,16 @@ body {
     transition: all var(--transition-fast);
 }
 
-.brand-chip.active, .brand-chip:hover {
-    background: var(--ink-primary);
-    color: var(--ink-inverse);
+.brand-chip.active {
+    background: var(--accent-vermilion);
+    border-color: var(--accent-vermilion);
+    color: #FFFFFF !important;
+}
+
+.brand-chip:hover:not(.active) {
+    background: var(--bg-secondary);
+    color: var(--accent-vermilion);
+    border-color: var(--accent-vermilion);
 }
 
 .drivers-results-grid {
