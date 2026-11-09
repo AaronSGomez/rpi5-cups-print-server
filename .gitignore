@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+
+# Environment variables & secrets (NUNCA EXPONER EN GITHUB)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.id_rsa
+
+# OS & IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary & Logs
+*.log
+*.tmp
+*.bak
