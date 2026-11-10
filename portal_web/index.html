@@ -334,16 +334,17 @@
         <div class="os-tab-content-panel active" id="tab-windows">
             <div class="client-guide-split">
                 <div class="client-instruction-box">
-                    <h3>Instalación en 1 Clic (Modo Portátil)</h3>
+                    <h3>Instalación en 1 Clic (Instalador Todo en Uno 🏴‍☠️)</h3>
                     <p style="color: var(--ink-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
-                        La carpeta portátil <code>Cliente_Windows_ClickAndPlay</code> contiene un lanzador ejecutable que no requiere conocimientos técnicos ni instalación de software de terceros.
+                        La carpeta <code>Cliente_Windows_ClickAndPlay</code> incluye el instalador paquetizado <strong><code>INSTALAR_PRINT_SERVER_PI5.exe</code></strong> con icono de bandera pirata, que configura todo en un solo paso:
                     </p>
                     <ol class="instruction-steps-list">
-                        <li>Copia la carpeta <code>Cliente_Windows_ClickAndPlay</code> en el ordenador deseado.</li>
-                        <li>Haz doble clic sobre <strong><code>INSTALAR_IMPRESORA.bat</code></strong>.</li>
-                        <li>Acepta la elevación de privilegios de Administrador de Windows (UAC).</li>
-                        <li>El script te solicitará la IP local de tu Raspberry Pi, comprobará el puerto 631 y seleccionará el mejor controlador nativo (PCLmS / Microsoft IPP Class).</li>
-                        <li>Pulsa <strong>Enter</strong> para enviar una página de prueba.</li>
+                        <li>Copia la carpeta <code>Cliente_Windows_ClickAndPlay</code> en tu ordenador portátil o sobremesa.</li>
+                        <li>Haz doble clic sobre <strong><code>INSTALAR_PRINT_SERVER_PI5.exe</code></strong> (o <code>INSTALAR_IMPRESORA.bat</code>).</li>
+                        <li>Acepta la elevación de privilegios de Administrador (UAC).</li>
+                        <li>El instalador te solicitará la IP local de tu Raspberry Pi (si no existe <code>ip_servidor.txt</code>) y verificará la conectividad en el puerto 631.</li>
+                        <li>Instala la impresora con controlador nativo optimizado (PCLmS / Microsoft IPP).</li>
+                        <li>Registra y lanza de inmediato la aplicación de bandeja del sistema <strong><code>Print_Server_Pi5.exe</code></strong> junto al reloj.</li>
                     </ol>
                     <div style="font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-secondary); padding: 0.75rem; border-left: 3px solid var(--accent-vermilion);">
                         Tip: Si creas un archivo local <code>ip_servidor.txt</code> con tu IP en la carpeta, el instalador no te pedirá la IP y se instalará en modo 100% silencioso.
@@ -394,12 +395,12 @@
                     </div>
                 </div>
 
-                <div style="background: var(--bg-code); color: #F4F3EF; padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.6; border-radius: var(--radius-sm);">
-                    <div style="color: #9CA3AF;"># Archivos integrados en Cliente_Windows_ClickAndPlay y Cliente_Windows_Privado:</div>
-                    <div><span style="color: #60A5FA;">INICIAR_Print_Server_Pi5.bat</span>     <span style="color: #9CA3AF;">-&gt; Inicia el monitor silencioso en segundo plano.</span></div>
-                    <div><span style="color: #60A5FA;">ACTIVAR_INICIO_AUTOMATICO.bat</span>  <span style="color: #9CA3AF;">-&gt; Lo arranca automáticamente al encender el portátil.</span></div>
-                    <div><span style="color: #34D399;">REANUDAR_IMPRESORA.bat</span>         <span style="color: #9CA3AF;">-&gt; ¡1 Clic para desbloquear la cola CUPS tras sacar el papel atascado!</span></div>
-                    <div><span style="color: #F87171;">DETENER_Print_Server_Pi5.bat</span>     <span style="color: #9CA3AF;">-&gt; Detiene el proceso del monitor en cualquier momento.</span></div>
+                <div style="background: var(--bg-code); color: #F4F3EF; padding: 1.15rem; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.7; border-radius: var(--radius-sm);">
+                    <div style="color: #9CA3AF; margin-bottom: 0.4rem;"># Paquete Todo en Uno integrado con icono de Bandera Pirata 🏴‍☠️:</div>
+                    <div><span style="color: #FBBF24; font-weight: 700;">INSTALAR_PRINT_SERVER_PI5.exe</span>  <span style="color: #9CA3AF;">-&gt; Instalador ejecutable único todo-en-uno (con icono pirata).</span></div>
+                    <div><span style="color: #60A5FA; font-weight: 700;">Print_Server_Pi5.exe</span>           <span style="color: #9CA3AF;">-&gt; App de Bandeja (System Tray) con menú interactivo y Toasts.</span></div>
+                    <div><span style="color: #34D399; font-weight: 700;">[ Menú Bandeja &gt; Reanudar ]</span>     <span style="color: #9CA3AF;">-&gt; ¡1 Clic para desbloquear la cola CUPS tras un atasco!</span></div>
+                    <div><span style="color: #E5E7EB; font-weight: 700;">[ Menú Bandeja &gt; Cancelar ]</span>     <span style="color: #9CA3AF;">-&gt; Purgar y limpiar trabajos atascados sin comandos.</span></div>
                 </div>
             </div>
         </div>

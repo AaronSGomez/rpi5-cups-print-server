@@ -1,27 +1,24 @@
 @echo off
 :: =============================================================================
-:: INSTALADOR CLICK & PLAY — IMPRESORA HP LASERJET M14-M17 (RED LOCAL HOGAR)
+:: 🏴‍☠️ INSTALADOR TODO EN UNO — PRINT_SERVER_PI5 (HP LASERJET M14-M17)
 :: =============================================================================
 setlocal enableextensions
 cd /d "%~dp0"
 
-title Instalador de Impresora en Red Local
+title Instalador Todo en Uno - Print_Server_Pi5
 
-:: Comprobar si se ejecuta con permisos de administrador; si no, auto-elevar con UAC
+if exist "%~dp0INSTALAR_PRINT_SERVER_PI5.exe" (
+    start "" "%~dp0INSTALAR_PRINT_SERVER_PI5.exe"
+    exit /b
+)
+
+:: Fallback con elevación UAC y PowerShell
 net session >nul 2>&1
 if %errorLevel% neq 0 (
-    echo =====================================================================
-    echo  Solicitando permisos de Administrador para instalar la impresora...
-    echo =====================================================================
+    echo [!] Solicitando permisos de Administrador...
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
 
-:: Ejecutar el script PowerShell en modo interactivo y transparente
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Instalar_Impresora.ps1"
-
-if %errorLevel% neq 0 (
-    echo.
-    echo [!] Hubo una advertencia o error durante la instalacion.
-    pause
-)
+if %errorLevel% neq 0 pause

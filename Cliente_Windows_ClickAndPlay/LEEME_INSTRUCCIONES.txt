@@ -1,37 +1,46 @@
 =============================================================================
-CLIENTE WINDOWS 10 / 11 CLICK & PLAY - SERVIDOR DE IMPRESIÓN RASPBERRY PI
+🏴‍☠️ CLIENTE WINDOWS 10 / 11 CLICK & PLAY — PRINT_SERVER_PI5
 =============================================================================
 
-1. INSTALACIÓN DE LA IMPRESORA (1 CLIC):
-   - Haz doble clic en "INSTALAR_IMPRESORA.bat".
-   - Si es la primera vez, introduce la IP local de tu Raspberry Pi cuando te lo pida.
-   - Configurará automáticamente el puerto IPP y el mejor controlador compatible.
+Este paquete contiene el sistema completo de impresión, monitorización y
+recuperación de atascos para el servidor Raspberry Pi 5.
 
 -----------------------------------------------------------------------------
-2. MONITOR EN TIEMPO REAL (PRINT_SERVER_PI5):
-   Soluciona el problema de no saber si un trabajo falló, se imprimió o se atascó.
-   Windows por defecto borra el trabajo de la cola en cuanto lo envía y no avisa.
-   Este servicio monitoriza el servidor CUPS y te avisa con notificaciones Toast:
-     • "🖨️ Imprimiendo documento" al enviar la orden.
-     • "✅ Impresión Completada con Éxito" cuando la hoja sale físicamente.
-     • "⚠️ ATASCO O ERROR DE IMPRESIÓN" con sonido de alarma si la cola se detiene.
+1. INSTALACIÓN TODO EN UNO (1 CLIC):
+-----------------------------------------------------------------------------
+   Haz doble clic sobre el ejecutable con icono de bandera pirata:
+   👉 INSTALAR_PRINT_SERVER_PI5.exe
+      (o sobre INSTALAR_IMPRESORA.bat)
 
-   ARCHIVOS DEL MONITOR:
-   - INICIAR_Print_Server_Pi5.bat:
-     Inicia el monitor en segundo plano (sin dejar consolas abiertas).
-   - ACTIVAR_INICIO_AUTOMATICO.bat:
-     Hace que se inicie solo cada vez que arranques tu portátil o PC.
-   - DESACTIVAR_INICIO_AUTOMATICO.bat:
-     Elimina el inicio automático si no lo deseas.
-   - DETENER_Print_Server_Pi5.bat:
-     Detiene el monitor en segundo plano.
-   - PROBAR_NOTIFICACIONES.bat:
-     Lanza 3 notificaciones de prueba inmediatas en pantalla.
+   ¿Qué hace automáticamente?
+   • Te solicitará la IP local de tu Raspberry Pi (si no existe ip_servidor.txt).
+   • Probará la conexión con el puerto 631 de CUPS.
+   • Instalará la impresora HP LaserJet M14-M17 en tu Spooler de Windows.
+   • Configurará e iniciará el monitor de bandeja del sistema Print_Server_Pi5.exe.
+   • Configurará el auto-arranque con Windows (Startup).
+   • Te permitirá enviar una página de prueba.
 
 -----------------------------------------------------------------------------
-3. DESBLOQUEO TRAS ATASCOS DE PAPEL:
-   - REANUDAR_IMPRESORA.bat:
-     Cuando la impresora sufra un atasco, retira el papel atascado y haz doble clic
-     en este archivo. Desbloqueará la cola CUPS en la Raspberry Pi de inmediato
-     sin tener que entrar por SSH ni a la web de CUPS.
+2. SERVICIO EN LA BANDEJA DEL SISTEMA (JUNTO AL RELOJ):
+-----------------------------------------------------------------------------
+   Una vez instalado, verás el icono pirata en la barra de tareas de Windows.
+   • Notificaciones flotantes automáticas:
+       - 🖨️ "Imprimiendo documento" al enviar la orden.
+       - ✅ "Impresión Completada con Éxito" cuando la hoja sale físicamente.
+       - ⚠️ "ATASCO O ERROR DE IMPRESIÓN" con sonido de alarma ante atascos.
+
+   • Menú con clic derecho en el icono pirata:
+       - 🟢 Estado en vivo de la impresora.
+       - ⚡ "Desbloquear y Reanudar Impresora": ¡1 solo clic para reactivar CUPS tras sacar el papel!
+       - 🧹 "Cancelar trabajos atascados": para purgar la cola si una hoja se rompió.
+       - 📋 "Ver Cola de Trabajos (Web CUPS)": acceso directo al navegador.
+       - ⚙️ "Cambiar IP del Servidor": si cambias de router o de IP.
+       - 🔄 "Iniciar con Windows": activa o desactiva el inicio automático.
+       - ❌ "Salir": cierra el monitor.
+
+-----------------------------------------------------------------------------
+3. DESINSTALACIÓN:
+-----------------------------------------------------------------------------
+   Si en algún momento deseas retirar la impresora de un equipo temporal,
+   haz doble clic en "DESINSTALAR_IMPRESORA.bat".
 =============================================================================
