@@ -124,11 +124,9 @@ ErrorPolicy retry-job
 Port 631
 Listen /run/cups/cups.sock
 
-# Descubrimiento de red mDNS / DNS-SD
+# Delegamos la difusión mDNS a Avahi (evita anuncios IPPS con TLS autofirmado que bloquean Android/Mopria)
 Browsing On
-BrowseLocalProtocols dnssd
-BrowseRemoteProtocols dnssd
-BrowseAddress @LOCAL
+BrowseLocalProtocols none
 
 # Compartir impresoras por defecto
 DefaultShared Yes
@@ -136,9 +134,9 @@ DefaultShared Yes
 # Acepta peticiones dirigidas a cualquier hostname o IP local
 ServerAlias *
 
-# Política de autenticación
+# Política de autenticación sin forzar cifrado TLS en red local
 DefaultAuthType Basic
-DefaultEncryption IfRequested
+DefaultEncryption Never
 
 <Location />
   Order allow,deny
@@ -314,7 +312,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-# 8. CONFIGURACIÓN DE AVAHI (mDNS / DNS-SD / ZERO-CONFIG AIRPRINT)
+# 8. CONFIGURACIÓN DE AVAHI (mDNS / DNS-SD / ZERO-CONFIG AIRPRINT & MOPRIA)
 # -----------------------------------------------------------------------------
 log_info "Configurando Avahi Daemon (/etc/avahi/avahi-daemon.conf)..."
 
@@ -323,7 +321,40 @@ if [ -f "$AVAHI_CONF" ]; then
     sed -i 's/^#*use-ipv4=.*/use-ipv4=yes/' "$AVAHI_CONF"
     sed -i 's/^#*use-ipv6=.*/use-ipv6=yes/' "$AVAHI_CONF"
     sed -i 's/^#*enable-dbus=.*/enable-dbus=yes/' "$AVAHI_CONF"
+    # Restringir Avahi a la interfaz cableada eth0 para evitar colisiones con Wi-Fi (wlan0) o puentes Docker
+    sed -i '/^allow-interfaces=/d' "$AVAHI_CONF"
+    sed -i '/^\[server\]/a allow-interfaces=eth0' "$AVAHI_CONF"
 fi
+
+# Generación de servicio Avahi nativo para AirPrint (iOS) y Mopria (Android) sin IPPS/TLS conflictivo
+PRIMARY_IP=$(ip -4 addr show eth0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -n 1 || hostname -I | awk '{print $1}')
+AVAHI_SERVICE_FILE="/etc/avahi/services/${PRINTER_QUEUE_NAME}.service"
+log_info "Creando servicio Avahi AirPrint/Mopria en ${AVAHI_SERVICE_FILE} con IP objetivo ${PRIMARY_IP}..."
+
+cat << EOF > "$AVAHI_SERVICE_FILE"
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="yes">${PRINTER_DESCRIPTION}</name>
+  <service>
+    <type>_ipp._tcp</type>
+    <subtype>_universal._sub._ipp._tcp</subtype>
+    <port>631</port>
+    <txt-record>txtvers=1</txt-record>
+    <txt-record>qtotal=1</txt-record>
+    <txt-record>rp=printers/${PRINTER_QUEUE_NAME}</txt-record>
+    <txt-record>ty=${PRINTER_DESCRIPTION}</txt-record>
+    <txt-record>note=${PRINTER_LOCATION}</txt-record>
+    <txt-record>product=(${PRINTER_DESCRIPTION})</txt-record>
+    <txt-record>mopria-certified=1.3</txt-record>
+    <txt-record>pdl=application/pdf,application/postscript,image/jpeg,image/png,image/pwg-raster,image/urf</txt-record>
+    <txt-record>URF=V1.4,CP1,W8,PQ3-4,RS300,FN3</txt-record>
+    <txt-record>UUID=085f58f9-1214-31d8-5218-13596711784b</txt-record>
+    <txt-record>priority=0</txt-record>
+    <txt-record>adminurl=http://${PRIMARY_IP}:631/printers/${PRINTER_QUEUE_NAME}</txt-record>
+  </service>
+</service-group>
+EOF
 
 # -----------------------------------------------------------------------------
 # 9. CONFIGURACIÓN DE FIREWALL (UFW) PARA ACCESO LOCAL
