@@ -13,6 +13,7 @@
     
     <!-- Hoja de Estilos del Sistema -->
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
 
@@ -334,7 +335,7 @@
         <div class="os-tab-content-panel active" id="tab-windows">
             <div class="client-guide-split">
                 <div class="client-instruction-box">
-                    <h3>Instalación en 1 Clic (Instalador Todo en Uno 🏴‍☠️)</h3>
+                    <h3><img src="assets/favicon.png" alt="Bandera Pirata" style="width: 22px; height: 22px; vertical-align: -3px; margin-right: 8px; display: inline-block;">Instalación en 1 Clic (Instalador Todo en Uno 🏴‍☠️)</h3>
                     <p style="color: var(--ink-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
                         La carpeta <code>Cliente_Windows_ClickAndPlay</code> incluye el instalador paquetizado <strong><code>INSTALAR_PRINT_SERVER_PI5.exe</code></strong> con icono de bandera pirata, que configura todo en un solo paso:
                     </p>
@@ -401,6 +402,25 @@
                     <div><span style="color: #60A5FA; font-weight: 700;">Print_Server_Pi5.exe</span>           <span style="color: #9CA3AF;">-&gt; App de Bandeja (System Tray) con menú interactivo y Toasts.</span></div>
                     <div><span style="color: #34D399; font-weight: 700;">[ Menú Bandeja &gt; Reanudar ]</span>     <span style="color: #9CA3AF;">-&gt; ¡1 Clic para desbloquear la cola CUPS tras un atasco!</span></div>
                     <div><span style="color: #A78BFA; font-weight: 700;">Scripts_Ejecucion_Manual/</span>       <span style="color: #9CA3AF;">-&gt; Subcarpeta separada con scripts .bat y PowerShell manuales.</span></div>
+                </div>
+
+                <!-- Captura de Producción: Servicio en Bandeja de Windows & Cola Web CUPS -->
+                <div style="margin-top: 1.5rem; border: 1px solid var(--border-strong); background: var(--bg-surface); padding: 1.25rem; box-shadow: 4px 4px 0px var(--border-strong);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <img src="assets/favicon.png" alt="Icono Pirata" style="width: 14px; height: 14px;">
+                            CAPTURA EN WINDOWS // SERVICIO EN BANDEJA &amp; GESTIÓN WEB CUPS
+                        </span>
+                        <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-muted); background: var(--bg-secondary); padding: 0.2rem 0.5rem; border: 1px solid var(--border-subtle);">
+                            HOST: WINDOWS 10 / 11 &amp; RASPBERRY PI 5
+                        </span>
+                    </div>
+                    <div style="border: 1px solid var(--border-subtle); overflow: hidden; background: #000; border-radius: 2px;">
+                        <img src="assets/servicio.png" alt="Servicio Print_Server_Pi5 activo en la bandeja del sistema y cola web de CUPS" style="width: 100%; height: auto; display: block;">
+                    </div>
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-secondary); margin-top: 0.75rem; line-height: 1.5;">
+                        <strong style="color: var(--ink-primary);">Vista en ejecución real:</strong> En el área de notificación (System Tray) junto al reloj de Windows se encuentra activo el monitor residente <strong>Print_Server_Pi5</strong> (<img src="assets/favicon.png" alt="Icono" style="width: 14px; height: 14px; vertical-align: -2px;">). En paralelo, la interfaz web de CUPS muestra el estado y avance de las tareas de impresión de la red en tiempo real.
+                    </div>
                 </div>
             </div>
         </div>
@@ -716,7 +736,7 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
                     Sistema de automatización de red e infraestructura de impresión soberana para Raspberry Pi 5 (ARM64). Diseñado con principios de tipografía editorial suiza y rigor de ingeniería en sistemas Linux.
                 </p>
                 <p style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-muted); margin-top: 1.25rem;">
-                    Licencia MIT &bull; Desarrollado por <a href="https://aaronsgomez.es" target="_blank" rel="noopener" style="color: var(--accent-vermilion); font-weight: 700; text-decoration: underline;">Aarón Gómez</a> &bull; 2026
+                    Licencia MIT &bull; Desarrollado por <a href="https://aaronsgomez.es" target="_blank" rel="noopener" style="color: var(--accent-vermilion); font-weight: 700; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.35rem;"><img src="assets/favicon.png" alt="Aarón Gómez" style="width: 16px; height: 16px; vertical-align: middle;">Aarón Gómez</a> &bull; 2026
                 </p>
             </div>
 
@@ -744,8 +764,8 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
                 <h4 class="footer-col-title">Autor & Contacto</h4>
                 <ul class="footer-link-list">
                     <li>
-                        <a href="https://aaronsgomez.es" target="_blank" rel="noopener">
-                            <span class="pirate-flag-symbol">🏴‍☠️</span>
+                        <a href="https://aaronsgomez.es" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <img src="assets/favicon.png" alt="Bandera Pirata Aarón Gómez" style="width: 18px; height: 18px; object-fit: contain;">
                             <span>aaronsgomez.es &rarr;</span>
                         </a>
                     </li>
