@@ -248,18 +248,22 @@ server_print/
 ├── Print_Server_Pi5.cs                        # Código fuente C# de la aplicación System Tray
 │
 └── Cliente_Windows_ClickAndPlay/              # Paquete portátil para usuarios y lectores
-    ├── INSTALAR_PRINT_SERVER_PI5.exe          # 🏴‍☠️ Instalador ejecutable único todo-en-uno
+    ├── INSTALAR_PRINT_SERVER_PI5.exe          # 🏴‍☠️ Instalador ejecutable único todo-en-uno (1 Clic)
     ├── Print_Server_Pi5.exe                   # 🏴‍☠️ App de bandeja System Tray con Toasts
-    ├── pirata.ico                             # Icono embebido para Windows
-    ├── INSTALAR_IMPRESORA.bat                 # Lanzador de instalación por lotes
-    ├── DESINSTALAR_IMPRESORA.bat              # Script de limpieza y desinstalación
-    ├── REANUDAR_IMPRESORA.bat                 # Desbloqueo rápido tras atascos mecánicos
-    ├── INICIAR_Print_Server_Pi5.bat           # Lanzador del monitor en segundo plano
-    ├── DETENER_Print_Server_Pi5.bat           # Detención del monitor
-    ├── ACTIVAR_INICIO_AUTOMATICO.bat          # Registro en el arranque de Windows
-    ├── DESACTIVAR_INICIO_AUTOMATICO.bat       # Desactivación del arranque automático
-    ├── PROBAR_NOTIFICACIONES.bat              # Test de notificaciones emergentes
-    └── LEEME_INSTRUCCIONES.txt                # Manual de uso y elección entre Modo 1 y Modo 2
+    ├── pirata.ico                             # Icono oficial pirata
+    ├── LEEME_INSTRUCCIONES.txt                # Manual de uso y elección entre Modo 1 y Modo 2
+    │
+    └── Scripts_Ejecucion_Manual/              # 🛠️ Carpeta con herramientas por lotes y PowerShell
+        ├── INSTALAR_IMPRESORA.bat             # Instalación manual clásica por lotes
+        ├── DESINSTALAR_IMPRESORA.bat          # Script de limpieza y desinstalación
+        ├── REANUDAR_IMPRESORA.bat             # Desbloqueo rápido tras atascos mecánicos
+        ├── INICIAR_Print_Server_Pi5.bat       # Lanzador del monitor en segundo plano
+        ├── DETENER_Print_Server_Pi5.bat       # Detención del monitor
+        ├── ACTIVAR_INICIO_AUTOMATICO.bat      # Registro en el arranque de Windows
+        ├── DESACTIVAR_INICIO_AUTOMATICO.bat   # Desactivación del arranque automático
+        ├── PROBAR_NOTIFICACIONES.bat          # Test de notificaciones emergentes
+        ├── Monitor_Impresora.ps1              # Script de monitorización pasiva
+        └── Reanudar_Impresora.ps1             # Script de reactivación de cola CUPS
 ```
 
 ---

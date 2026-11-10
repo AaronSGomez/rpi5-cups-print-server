@@ -35,7 +35,7 @@ if (-not $isAdmin) {
 # -----------------------------------------------------------------------------
 # 2. DETERMINACION DE LA IP DEL SERVIDOR (AUTOMATICA O MANUAL)
 # -----------------------------------------------------------------------------
-$ipConfigFile = Join-Path $PSScriptRoot "ip_servidor.txt"
+$ipConfigFile = Join-Path $PSScriptRoot "ip_servidor.txt"`nif (-not (Test-Path $ipConfigFile)) { $parentIp = Join-Path $PSScriptRoot "..\ip_servidor.txt"; if (Test-Path $parentIp) { $ipConfigFile = $parentIp } }
 $activeHost = $null
 
 # A) Comprobar si existe archivo local preconfigurado (ip_servidor.txt)

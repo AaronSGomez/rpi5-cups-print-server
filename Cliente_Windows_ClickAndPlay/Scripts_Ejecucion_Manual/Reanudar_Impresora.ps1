@@ -5,7 +5,7 @@ param(
     [string]$User = ""
 )
 
-$ipFile = Join-Path $PSScriptRoot "ip_servidor.txt"
+$ipFile = Join-Path $PSScriptRoot "ip_servidor.txt"`nif (-not (Test-Path $ipFile)) { $parentIp = Join-Path $PSScriptRoot "..\ip_servidor.txt"; if (Test-Path $parentIp) { $ipFile = $parentIp } }
 if (-not $ServerHost -and (Test-Path $ipFile)) {
     $c = (Get-Content $ipFile -Raw).Trim()
     if ($c) { $ServerHost = $c }

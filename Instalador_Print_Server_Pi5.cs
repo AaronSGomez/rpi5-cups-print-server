@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using Microsoft.Win32;
 
 namespace PrintServerInstaller
@@ -15,15 +16,31 @@ namespace PrintServerInstaller
             Console.OutputEncoding = Encoding.UTF8;
             Console.Title = "Instalador Print_Server_Pi5 — HP LaserJet";
 
-            // 1. Comprobación y auto-elevación a Administrador
+            bool isSilent = false;
+            foreach (string arg in args)
+            {
+                if (arg.Equals("/s", StringComparison.OrdinalIgnoreCase) ||
+                    arg.Equals("/silent", StringComparison.OrdinalIgnoreCase) ||
+                    arg.Equals("-q", StringComparison.OrdinalIgnoreCase))
+                {
+                    isSilent = true;
+                }
+            }
+
+            // 1. Auto-elevación a Administrador si es necesario
             if (!IsAdministrator())
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("[!] Solicitando permisos de Administrador para instalar la impresora...");
+                if (!isSilent)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("[!] Solicitando permisos de Administrador para configurar la impresora...");
+                }
+
                 try
                 {
                     ProcessStartInfo psi = new ProcessStartInfo();
                     psi.FileName = Process.GetCurrentProcess().MainModule.FileName;
+                    psi.Arguments = isSilent ? "/silent" : "";
                     psi.Verb = "runas";
                     psi.UseShellExecute = true;
                     Process.Start(psi);
@@ -32,25 +49,23 @@ namespace PrintServerInstaller
                 catch
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("[X] Se requieren permisos de Administrador para configurar controladores.");
+                    Console.WriteLine("[X] Se requieren permisos de Administrador para instalar controladores de Windows.");
                     Console.ResetColor();
-                    Console.ReadLine();
+                    if (!isSilent) Console.ReadLine();
                     return;
                 }
             }
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("=====================================================================");
-            Console.WriteLine("            🏴‍☠️  PRINT_SERVER_PI5 — INSTALADOR TODO EN UNO  🏴‍☠️       ");
+            Console.WriteLine("            🏴‍☠️  PRINT_SERVER_PI5 — INSTALADOR AUTOMATIZADO 🏴‍☠️       ");
             Console.WriteLine("=====================================================================");
             Console.ResetColor();
-            Console.WriteLine();
-            Console.WriteLine("Este instalador configurará automáticamente en tu equipo:");
-            Console.WriteLine("  1. Impresora HP LaserJet M14-M17 compartida por CUPS (Red Local).");
-            Console.WriteLine("  2. Monitor de bandeja del sistema (System Tray) con icono pirata.");
-            Console.WriteLine("  3. Notificaciones Toast nativas (En proceso, Éxito, Atascos).");
-            Console.WriteLine("  4. Desbloqueo y reanudación de cola en 1 clic (sin comandos).");
-            Console.WriteLine("  5. Inicio automático con Windows.");
+            Console.WriteLine("Instalando de forma automatizada:");
+            Console.WriteLine("  • Impresora de red HP LaserJet M14-M17 (CUPS IPP)");
+            Console.WriteLine("  • Servicio de bandeja del sistema Print_Server_Pi5 con icono pirata");
+            Console.WriteLine("  • Notificaciones flotantes y desbloqueo de atascos en 1 clic");
+            Console.WriteLine("  • Inicio automático con Windows");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("=====================================================================");
             Console.ResetColor();
@@ -65,20 +80,19 @@ namespace PrintServerInstaller
                 serverHost = File.ReadAllText(ipConfigFile).Trim();
             }
 
+            // Si hay IP preconfigurada, instalar de forma 100% desatendida
             if (!string.IsNullOrEmpty(serverHost))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("[*] Servidor preconfigurado detectado: " + serverHost);
+                Console.WriteLine("[*] Modo desatendido: Servidor detectado en ip_servidor.txt: " + serverHost);
                 Console.ResetColor();
-                Console.Write("¿Deseas usar esta IP? (Enter para Sí, o escribe una nueva IP): ");
-                string custom = Console.ReadLine().Trim();
-                if (!string.IsNullOrEmpty(custom)) serverHost = custom;
             }
             else
             {
+                // Solo si no existe ip_servidor.txt, pedirla una única vez
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Por favor, introduce la dirección IP local de tu Raspberry Pi:");
-                Console.WriteLine("(Ejemplo habitual: 192.168.1.100 o la IP asignada en tu router)");
+                Console.WriteLine("Introduce la dirección IP local de tu Raspberry Pi (servidor CUPS):");
+                Console.WriteLine("(Ejemplo: 192.168.1.100 o la IP asignada en tu router)");
                 Console.ResetColor();
 
                 while (string.IsNullOrEmpty(serverHost))
@@ -86,31 +100,32 @@ namespace PrintServerInstaller
                     Console.Write("Dirección IP: ");
                     serverHost = Console.ReadLine().Trim();
                 }
+
+                try { File.WriteAllText(ipConfigFile, serverHost); } catch {}
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("[OK] IP guardada en ip_servidor.txt");
+                Console.ResetColor();
             }
 
-            // Comprobar conectividad
+            // 2. Comprobar conectividad
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("[*] Comprobando conexión con " + serverHost + ":631... ");
             if (TestTcp(serverHost, 631))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("[OK - CONECTADO]");
+                Console.WriteLine("[CONECTADO OK]");
                 Console.ResetColor();
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("[AVISO: El puerto 631 no respondió de inmediato, continuando...]");
+                Console.WriteLine("[Aviso: Puerto 631 no respondió de inmediato, continuando...]");
                 Console.ResetColor();
             }
 
-            // Guardar en ip_servidor.txt
-            try { File.WriteAllText(ipConfigFile, serverHost); } catch {}
-
-            // 2. Instalación de la Impresora en Windows Spooler
-            Console.WriteLine();
+            // 3. Registrar Impresora en Windows Spooler
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[*] Registrando impresora en Windows...");
+            Console.WriteLine("[*] Configurando cola de impresión en Windows...");
             Console.ResetColor();
 
             string printerName = "HP LaserJet M14-M17 (Red Hogar)";
@@ -128,14 +143,13 @@ namespace PrintServerInstaller
                 "  $cmd = '/b \"' + $pName + '\" /x /n \"' + $pName + '\" /if /f \"\" /r \"' + $port + '\" /m \"' + $sel + '\"';\n" +
                 "  Start-Process 'rundll32.exe' -ArgumentList ('printui.dll,PrintUIEntry ' + $cmd) -Wait;\n" +
                 "}\n" +
-                "Write-Host '[OK] Impresora configurada con controlador: ' $sel -ForegroundColor Green;\n";
+                "Write-Host '[OK] Impresora registrada con controlador: ' $sel -ForegroundColor Green;\n";
 
             RunPowerShell(psScript);
 
-            // 3. Registrar Print_Server_Pi5.exe en inicio automático
-            Console.WriteLine();
+            // 4. Iniciar y registrar Print_Server_Pi5.exe en inicio automático
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[*] Configurando inicio automático del servicio de bandeja...");
+            Console.WriteLine("[*] Configurando servicio residente de bandeja del sistema...");
             Console.ResetColor();
 
             string trayExe = Path.Combine(appDir, "Print_Server_Pi5.exe");
@@ -143,54 +157,59 @@ namespace PrintServerInstaller
             {
                 try
                 {
+                    // Registro en inicio con Windows
                     using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
                     {
                         rk.SetValue("Print_Server_Pi5", "\"" + trayExe + "\"");
                     }
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("[OK] Print_Server_Pi5 registrado para arrancar con Windows.");
-                    Console.ResetColor();
 
-                    // Iniciar el monitor inmediatamente
+                    // Detener cualquier instancia previa si existiera
+                    foreach (Process p in Process.GetProcessesByName("Print_Server_Pi5"))
+                    {
+                        try { p.Kill(); } catch {}
+                    }
+
+                    // Iniciar el monitor
                     Process.Start(new ProcessStartInfo() {
                         FileName = trayExe,
                         WorkingDirectory = appDir
                     });
+
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("[OK] Monitor de bandeja iniciado correctamente junto al reloj.");
+                    Console.WriteLine("[OK] Print_Server_Pi5 iniciado en segundo plano junto al reloj.");
                     Console.ResetColor();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("[!] Nota sobre inicio automático: " + ex.Message);
+                    Console.WriteLine("[!] Nota sobre inicio de servicio: " + ex.Message);
                 }
             }
 
-            // 4. Preguntar página de prueba
             Console.WriteLine();
-            Console.Write("¿Deseas enviar una página de prueba a la impresora ahora? (S/N) [Por defecto: S]: ");
-            string resp = Console.ReadLine().Trim().ToUpper();
-            if (resp == "" || resp.StartsWith("S"))
-            {
-                Console.WriteLine("[*] Enviando página de prueba...");
-                RunPowerShell("Start-Process 'rundll32.exe' -ArgumentList 'printui.dll,PrintUIEntry /k /n \"" + printerName + "\"' -Wait;");
-            }
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("=====================================================================");
+            Console.WriteLine("     ¡INSTALACIÓN COMPLETADA DE FORMA EXITOSA!                       ");
+            Console.WriteLine("=====================================================================");
+            Console.ResetColor();
+            Console.WriteLine("• Impresora configurada: " + printerName);
+            Console.WriteLine("• Servicio activo:      Icono de bandera pirata en la barra de tareas.");
+            Console.WriteLine("• En caso de atasco:     Clic derecho en el icono > Desbloquear y Reanudar.");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("=====================================================================");
+            Console.ResetColor();
+            Console.WriteLine();
 
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("=====================================================================");
-            Console.WriteLine("      ¡INSTALACIÓN COMPLETADA CON ÉXITO!                             ");
-            Console.WriteLine("=====================================================================");
-            Console.ResetColor();
-            Console.WriteLine("• Impresora lista: " + printerName);
-            Console.WriteLine("• Monitor activo:  Busca el icono pirata junto al reloj de Windows.");
-            Console.WriteLine("• En caso de atasco: Clic derecho en el icono > Desbloquear y Reanudar.");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("=====================================================================");
-            Console.ResetColor();
-            Console.WriteLine();
-            Console.WriteLine("Presiona Enter para finalizar...");
-            Console.ReadLine();
+            if (!isSilent)
+            {
+                Console.WriteLine("Finalizando en 3 segundos (o presiona Enter)...");
+                int waited = 0;
+                while (waited < 30)
+                {
+                    if (Console.KeyAvailable) { Console.ReadKey(); break; }
+                    Thread.Sleep(100);
+                    waited++;
+                }
+            }
         }
 
         static bool IsAdministrator()
@@ -222,7 +241,8 @@ namespace PrintServerInstaller
             psi.FileName = "powershell.exe";
             psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"" + script.Replace("\"", "\\\"") + "\"";
             psi.UseShellExecute = false;
-            psi.CreateNoWindow = false;
+            psi.CreateNoWindow = true;
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
             Process p = Process.Start(psi);
             p.WaitForExit();
         }

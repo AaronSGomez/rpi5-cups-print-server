@@ -360,6 +360,11 @@ namespace PrintServerPi5
                 try
                 {
                     string psScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reanudar_Impresora.ps1");
+                    if (!File.Exists(psScript))
+                    {
+                        psScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts_Ejecucion_Manual", "Reanudar_Impresora.ps1");
+                    }
+
                     if (File.Exists(psScript))
                     {
                         System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo();

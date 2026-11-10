@@ -1,64 +1,40 @@
 =============================================================================
 🏴‍☠️ CLIENTE WINDOWS 10 / 11 CLICK & PLAY — PRINT_SERVER_PI5
 =============================================================================
-Guía de uso para lectores y usuarios: elige cómo prefieres usar la impresora.
 
-Tienes DOS formas de utilizar este paquete según tus preferencias:
-
-=============================================================================
-MODO 1 (RECOMENDADO): INSTALADOR TODO EN UNO Y SERVICIO EN BANDEJA
-=============================================================================
-Si deseas tener la experiencia completa con notificaciones flotantes y
-desbloqueo de atascos en 1 solo clic:
-
-1. Haz doble clic en el archivo con icono de bandera pirata:
-   👉 INSTALAR_PRINT_SERVER_PI5.exe
-
-2. ¿Qué hará este instalador?
-   • Te pedirá la dirección IP local de tu Raspberry Pi (ej: 192.168.1.100).
-   • Probará la conectividad en el puerto 631 de CUPS.
-   • Guardará tu IP en ip_servidor.txt para no volver a pedírtela.
-   • Instalará automáticamente la impresora en tu Windows (driver PCLmS / IPP).
-   • Configurará e iniciará el servicio residente Print_Server_Pi5.exe en
-     la bandeja del sistema (junto al reloj).
-   • Activará el inicio automático con Windows.
-   • Te permitirá enviar una página de prueba.
-
-3. ¿Qué ventajas te da el servicio residente (icono pirata junto al reloj)?
-   • Notificaciones flotantes (Toasts):
-       - 🖨️ "Imprimiendo documento" al enviar la orden.
-       - ✅ "Impresión Completada con Éxito" cuando la hoja sale del rodillo.
-       - ⚠️ "ATASCO O ERROR DE IMPRESIÓN" con sonido de alerta si la cola se detiene.
-   • Menú con clic derecho en el icono pirata:
-       - ⚡ "Desbloquear y Reanudar Impresora": ¡1 clic para reanudar tras un atasco!
-       - 🧹 "Cancelar trabajos atascados": para purgar la cola si se dañó el papel.
-       - 📋 "Ver Cola de Trabajos (Web CUPS)": abre el visor web oficial.
-       - ⚙️ "Cambiar IP del Servidor": si cambias de red o de router.
-       - 🔄 "Iniciar con Windows": activa o desactiva el arranque automático.
-       - ❌ "Salir": cierra el monitor.
-
+Este paquete contiene todo lo necesario para configurar tu equipo Windows
+con la impresora HP LaserJet compartida por Raspberry Pi 5.
 
 =============================================================================
-MODO 2: MODO LIGERO / SCRIPTS POR LOTES (SIN SOFTWARE RESIDENTE)
+1. INSTALACIÓN AUTOMÁTICA (RECOMENDADO — 1 CLIC):
 =============================================================================
-Si NO deseas tener ninguna aplicación abierta en la bandeja del sistema
-y solo quieres instalar la impresora y gestionar la cola mediante scripts:
+Para la gran mayoría de usuarios: no necesitas tocar ningún script de consola.
 
-1. Instalación de la impresora:
-   • Haz doble clic en 👉 INSTALAR_IMPRESORA.bat
-   • Introduce la IP de tu servidor cuando te lo solicite.
+👉 Haz doble clic en el ejecutable:
+   INSTALAR_PRINT_SERVER_PI5.exe (icono de bandera pirata)
 
-2. En caso de atasco de papel:
-   • Retira la hoja atascada de la impresora y cierra la tapa.
-   • Haz doble clic en 👉 REANUDAR_IMPRESORA.bat para reanudar la cola.
+¿Qué hace de forma automatizada?
+• Te pide la IP local de tu Raspberry Pi (si no existe ip_servidor.txt).
+• Comprueba la conectividad con CUPS en el puerto 631.
+• Instala la impresora en Windows Spooler con el driver óptimo (PCLmS / IPP).
+• Registra e inicia el servicio residente Print_Server_Pi5.exe junto al reloj.
+• Te permite resolver atascos de papel haciendo clic derecho en el icono pirata
+  y pulsando "⚡ Desbloquear y Reanudar Impresora".
 
-3. Scripts de control manual del monitor (opcionales):
-   • INICIAR_Print_Server_Pi5.bat: arranca el monitor manualmente.
-   • DETENER_Print_Server_Pi5.bat: cierra el monitor.
-   • ACTIVAR_INICIO_AUTOMATICO.bat: añade el monitor al arranque de Windows.
-   • DESACTIVAR_INICIO_AUTOMATICO.bat: quita el monitor del arranque.
-   • PROBAR_NOTIFICACIONES.bat: prueba los 3 avisos emergentes en pantalla.
+=============================================================================
+2. CONTROL MANUAL Y SCRIPTS POR LOTES (CARPETA SEPARADA):
+=============================================================================
+Si prefieres no utilizar el instalador .exe y prefieres ejecutar comandos
+manualmente mediante archivos .bat y PowerShell:
 
-4. Desinstalación:
-   • Haz doble clic en 👉 DESINSTALAR_IMPRESORA.bat para retirar la impresora.
+👉 Abre la subcarpeta: "Scripts_Ejecucion_Manual"
+
+Allí encontrarás todas las utilidades individuales:
+• INSTALAR_IMPRESORA.bat       -> Instalación clásica vía PowerShell.
+• REANUDAR_IMPRESORA.bat       -> Desbloqueo rápido tras atascos de papel.
+• DESINSTALAR_IMPRESORA.bat    -> Desinstalador limpio para equipos temporales.
+• INICIAR_Print_Server_Pi5.bat -> Arranque manual del monitor.
+• DETENER_Print_Server_Pi5.bat -> Detención del monitor.
+• ACTIVAR_INICIO_AUTOMATICO.bat-> Configurar arranque con Windows.
+• PROBAR_NOTIFICACIONES.bat    -> Test de alertas emergentes en pantalla.
 =============================================================================

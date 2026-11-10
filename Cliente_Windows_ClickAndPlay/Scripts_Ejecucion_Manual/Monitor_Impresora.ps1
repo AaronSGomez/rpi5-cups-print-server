@@ -1,4 +1,4 @@
-Ôªø[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$ServerHost = "",
     [int]$ServerPort = 631,
@@ -8,24 +8,24 @@ param(
 
 <#
 =============================================================================
-MONITOR DE NOTIFICACIONES DE IMPRESI√ìN (WINDOWS 10 / 11) - CLICK & PLAY
-Print_Server_Pi5 - Monitor_Impresora.ps1 (Versi√≥n Universal / Lectores)
+MONITOR DE NOTIFICACIONES DE IMPRESI”N (WINDOWS 10 / 11) - CLICK & PLAY
+Print_Server_Pi5 - Monitor_Impresora.ps1 (VersiÛn Universal / Lectores)
 =============================================================================
 Monitoriza en segundo plano el servidor CUPS (Raspberry Pi) en la red local:
- - Notificaci√≥n Toast cuando empieza una impresi√≥n
- - Notificaci√≥n Toast cuando la p√°gina sale con √©xito
+ - NotificaciÛn Toast cuando empieza una impresiÛn
+ - NotificaciÛn Toast cuando la p·gina sale con Èxito
  - Alerta roja sonora ante atasco de papel o bloqueo de la cola
  - Registro de actividad en monitor.log
- - Detecci√≥n y solicitud din√°mica de IP del servidor
+ - DetecciÛn y solicitud din·mica de IP del servidor
 =============================================================================
 #>
 
-# 1. VERIFICAR INSTANCIA √öNICA (MUTEX)
+# 1. VERIFICAR INSTANCIA ⁄NICA (MUTEX)
 $mutexName = "Global\Print_Server_Pi5_ClickAndPlay_Mutex"
 $createdNew = $false
 $mutex = New-Object System.Threading.Mutex($true, $mutexName, [ref]$createdNew)
 if (-not $createdNew -and -not $TestOnly) {
-    Write-Host "[!] Print_Server_Pi5 ya se encuentra en ejecuci√≥n en segundo plano." -ForegroundColor Yellow
+    Write-Host "[!] Print_Server_Pi5 ya se encuentra en ejecuciÛn en segundo plano." -ForegroundColor Yellow
     exit 0
 }
 
@@ -42,7 +42,7 @@ if (-not $ServerHost -and (Test-Path $ipConfigFile)) {
     }
 }
 
-# Si a√∫n no hay IP definida, solicitarla interactivamente
+# Si a˙n no hay IP definida, solicitarla interactivamente
 if (-not $ServerHost) {
     # Intentar por consola si hay terminal interactivo
     if ([Environment]::UserInteractive -and [Console]::WindowHeight -gt 0) {
@@ -54,7 +54,7 @@ if (-not $ServerHost) {
             $ServerHost = (Read-Host "Direccion IP (ej: 192.168.1.100)").Trim()
         }
     } else {
-        # Fallback gr√°fico con InputBox si se ejecut√≥ en segundo plano o sin consola
+        # Fallback gr·fico con InputBox si se ejecutÛ en segundo plano o sin consola
         try {
             Add-Type -AssemblyName Microsoft.VisualBasic
             $ServerHost = [Microsoft.VisualBasic.Interaction]::InputBox(
@@ -89,7 +89,7 @@ function Send-PrintToast {
         [ValidateSet("Info", "Success", "Warning", "Error")][string]$Type = "Info"
     )
 
-    Write-Log "NOTIFICACI√ìN [$Type]: $Title - $Message"
+    Write-Log "NOTIFICACI”N [$Type]: $Title - $Message"
 
     try {
         [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
@@ -127,7 +127,7 @@ function Send-PrintToast {
             return $true
         }
         catch {
-            Write-Log "Error al mostrar notificaci√≥n: $_"
+            Write-Log "Error al mostrar notificaciÛn: $_"
             return $false
         }
     }
@@ -186,21 +186,21 @@ function Get-CupsRecentJobs {
     }
 }
 
-# 5. MODO DE PRUEBA R√ÅPIDA (-TestOnly)
+# 5. MODO DE PRUEBA R¡PIDA (-TestOnly)
 if ($TestOnly) {
     Write-Host "[*] Enviando notificaciones de prueba al escritorio..." -ForegroundColor Cyan
     Send-PrintToast -Title "Print_Server_Pi5 - Test" -Message "Monitor conectado correctamente a $ServerHost." -Type "Info"
     Start-Sleep -Seconds 2
-    Send-PrintToast -Title "Impresi√≥n Completada" -Message "P√°gina de prueba finalizada con √©xito." -Type "Success"
+    Send-PrintToast -Title "ImpresiÛn Completada" -Message "P·gina de prueba finalizada con Èxito." -Type "Success"
     Start-Sleep -Seconds 2
-    Send-PrintToast -Title "Alerta de Impresora" -Message "Simulaci√≥n: Atasco de papel detectado." -Type "Error"
+    Send-PrintToast -Title "Alerta de Impresora" -Message "SimulaciÛn: Atasco de papel detectado." -Type "Error"
     Write-Host "[OK] Pruebas finalizadas." -ForegroundColor Green
     exit 0
 }
 
-# 6. BUCLE PRINCIPAL DE MONITORIZACI√ìN
+# 6. BUCLE PRINCIPAL DE MONITORIZACI”N
 Write-Log "Print_Server_Pi5 iniciado para $QueueName en ${ServerHost}:${ServerPort}"
-Send-PrintToast -Title "Print_Server_Pi5 Activo" -Message "Vigilando cola de impresi√≥n en $ServerHost." -Type "Info"
+Send-PrintToast -Title "Print_Server_Pi5 Activo" -Message "Vigilando cola de impresiÛn en $ServerHost." -Type "Info"
 
 $initialJobs = Get-CupsRecentJobs
 $lastKnownJobId = 0
@@ -216,16 +216,16 @@ try {
         $pStatus = Get-CupsPrinterStatus
         $recentJobs = Get-CupsRecentJobs
 
-        # A) Detecci√≥n de atasco / detenci√≥n de la cola
+        # A) DetecciÛn de atasco / detenciÛn de la cola
         if ($pStatus.Online) {
             if ($pStatus.IsStopped -and -not $wasStopped) {
                 $wasStopped = $true
-                $desc = if ($pStatus.IsJam) { "¬°Atasco de papel detectado en la impresora!" } else { "La cola de impresi√≥n se ha detenido por fallo o atasco." }
-                Send-PrintToast -Title "‚ö†Ô∏è ATASCO O ERROR DE IMPRESI√ìN" -Message "$desc Retira el papel y haz doble clic en 'REANUDAR_IMPRESORA'." -Type "Error"
+                $desc = if ($pStatus.IsJam) { "°Atasco de papel detectado en la impresora!" } else { "La cola de impresiÛn se ha detenido por fallo o atasco." }
+                Send-PrintToast -Title "?? ATASCO O ERROR DE IMPRESI”N" -Message "$desc Retira el papel y haz doble clic en 'REANUDAR_IMPRESORA'." -Type "Error"
             }
             elseif (-not $pStatus.IsStopped -and $wasStopped) {
                 $wasStopped = $false
-                Send-PrintToast -Title "üü¢ Impresora Lista y Reanudada" -Message "La cola vuelve a estar activa y lista para imprimir." -Type "Success"
+                Send-PrintToast -Title "?? Impresora Lista y Reanudada" -Message "La cola vuelve a estar activa y lista para imprimir." -Type "Success"
             }
         }
 
@@ -234,7 +234,7 @@ try {
             if ($job.Id -gt $lastKnownJobId) {
                 $lastKnownJobId = $job.Id
                 $trackedJobs[$job.Id] = $job.Status
-                Send-PrintToast -Title "üñ®Ô∏è Imprimiendo documento" -Message "Trabajo #${($job.Id)} en proceso: '$($job.Name)' ($($job.Pages) p√°g)." -Type "Info"
+                Send-PrintToast -Title "??? Imprimiendo documento" -Message "Trabajo #${($job.Id)} en proceso: '$($job.Name)' ($($job.Pages) p·g)." -Type "Info"
             }
             elseif ($trackedJobs.ContainsKey($job.Id)) {
                 $prevStatus = $trackedJobs[$job.Id]
@@ -242,15 +242,15 @@ try {
                     $trackedJobs[$job.Id] = $job.Status
 
                     if ($job.Status -match "completado" -or $job.Status -match "completed") {
-                        Send-PrintToast -Title "‚úÖ Impresi√≥n Completada con √âxito" -Message "El trabajo #${($job.Id)} ha salido correctamente de la impresora." -Type "Success"
+                        Send-PrintToast -Title "? ImpresiÛn Completada con …xito" -Message "El trabajo #${($job.Id)} ha salido correctamente de la impresora." -Type "Success"
                         $trackedJobs.Remove($job.Id)
                     }
                     elseif ($job.Status -match "parado" -or $job.Status -match "stopped" -or $job.Status -match "error" -or $job.Status -match "aborted") {
-                        Send-PrintToast -Title "‚ùå Error en Trabajo #${($job.Id)}" -Message "El trabajo se ha detenido o ha fallado: $($job.Status)" -Type "Error"
+                        Send-PrintToast -Title "? Error en Trabajo #${($job.Id)}" -Message "El trabajo se ha detenido o ha fallado: $($job.Status)" -Type "Error"
                         $trackedJobs.Remove($job.Id)
                     }
                     elseif ($job.Status -match "cancelado" -or $job.Status -match "canceled") {
-                        Send-PrintToast -Title "‚ÑπÔ∏è Trabajo #${($job.Id)} Cancelado" -Message "La impresi√≥n ha sido cancelada." -Type "Info"
+                        Send-PrintToast -Title "?? Trabajo #${($job.Id)} Cancelado" -Message "La impresiÛn ha sido cancelada." -Type "Info"
                         $trackedJobs.Remove($job.Id)
                     }
                 }
