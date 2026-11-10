@@ -1324,3 +1324,72 @@ img, svg {
     display: inline-flex;
     align-items: center;
 }
+
+/* =============================================================================
+   ZOOM INTERACTIVO EN HOVER PARA CAPTURAS TÉCNICAS (SOLO ESCRITORIO / RATÓN)
+   ============================================================================= */
+.interactive-zoom-container {
+    position: relative;
+    max-width: 350px;
+    width: 100%;
+    justify-self: center;
+    border: 1px solid var(--border-subtle);
+    background: #000;
+    border-radius: 3px;
+    box-shadow: 2px 2px 0px var(--border-strong);
+    transition: box-shadow var(--transition-smooth);
+}
+
+.interactive-zoom-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: zoom-in;
+    border-radius: 2px;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, outline 0.2s ease;
+    transform-origin: 75% center;
+}
+
+.zoom-hint-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(18, 19, 22, 0.85);
+    color: #F4F3EF;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 2px;
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: opacity var(--transition-fast);
+}
+
+@media (hover: hover) and (min-width: 860px) {
+    .interactive-zoom-container:hover {
+        z-index: 120;
+    }
+
+    .interactive-zoom-container:hover .interactive-zoom-img {
+        transform: scale(2.15);
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--accent-vermilion);
+        position: relative;
+        z-index: 121;
+    }
+
+    .interactive-zoom-container:hover .zoom-hint-badge {
+        opacity: 0;
+    }
+}
+
+@media (hover: none), (max-width: 859px) {
+    .interactive-zoom-img {
+        cursor: default;
+    }
+    .zoom-hint-badge {
+        display: none;
+    }
+}

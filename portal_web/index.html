@@ -405,7 +405,7 @@
                 </div>
 
                 <!-- Captura de Producción: Servicio en Bandeja de Windows & Cola Web CUPS (Compacto) -->
-                <div style="margin-top: 1.25rem; border: 1px solid var(--border-strong); background: var(--bg-surface); padding: 1.1rem 1.25rem;">
+                <div style="margin-top: 1.25rem; border: 1px solid var(--border-strong); background: var(--bg-surface); padding: 1.1rem 1.25rem; position: relative;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: center;">
                         <div>
                             <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem; display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -422,8 +422,9 @@
                                 Permite consultar los estados o desbloquear la cola CUPS en caso de pausa por atasco o falta de papel con 1 solo clic.
                             </p>
                         </div>
-                        <div style="border: 1px solid var(--border-subtle); background: #000; border-radius: 3px; overflow: hidden; box-shadow: 2px 2px 0px var(--border-strong); max-width: 350px; justify-self: center;">
-                            <img src="assets/servicio.png" alt="Servicio Print_Server_Pi5 activo en la bandeja del sistema y cola web de CUPS" style="width: 100%; height: auto; display: block;">
+                        <div class="interactive-zoom-container">
+                            <img class="interactive-zoom-img" src="assets/servicio.png" alt="Servicio Print_Server_Pi5 activo en la bandeja del sistema y cola web de CUPS">
+                            <span class="zoom-hint-badge">🔍 Hover para ampliar</span>
                         </div>
                     </div>
                 </div>
