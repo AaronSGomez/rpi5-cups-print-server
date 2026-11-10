@@ -54,7 +54,7 @@ Por defecto, Windows entrega los datos a la Raspberry Pi y borra el trabajo de s
 Para resolver esto, el paquete en [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) ofrece **dos modos de uso para que el usuario elija**:
 
 * **Modo 1 (Recomendado / App con Icono Pirata 🏴‍☠️):**
-  - **`INSTALAR_PRINT_SERVER_PI5.exe`**: Instalador todo-en-uno que solicita la IP del servidor CUPS al usuario (si no existe `ip_servidor.txt`), comprueba la conexión con el puerto 631, registra la impresora y configura la aplicación residente.
+  - **`INSTALAR_PRINT_SERVER_PI5.exe`**: Instalador todo-en-uno que solicita la IP del servidor CUPS al usuario (si no existe `ip_servidor.txt`), comprueba la conexión con el puerto 631, registra la impresora y **despliega de forma permanente el software en `C:\Program Files\Print_Server_Pi5\`** (con acceso directo en el Menú Inicio y desinstalador automático).
   - **`Print_Server_Pi5.exe` (App de Bandeja / System Tray junto al reloj):**
     - 🖨️ **Notificaciones Toast nativas:** Avisos emergentes en tiempo real (*"Imprimiendo..."*, *"Completado con éxito"* y alarma sonora ante atascos).
     - ⚡ **Desbloqueo de atascos en 1 clic:** Cuando la impresora se atasca y CUPS detiene la cola por software, tras retirar el papel basta con hacer clic derecho en el icono pirata > **"Desbloquear y Reanudar Impresora"** para reactivar el servicio sin abrir consolas ni comandos.
@@ -62,7 +62,7 @@ Para resolver esto, el paquete en [`Cliente_Windows_ClickAndPlay/`](Cliente_Wind
     - 🔄 **Inicio automático:** Configurable con casilla de verificación.
 
 * **Modo 2 (Modo Ligero / Scripts por Lotes .bat y .ps1):**
-  - Para quienes no deseen aplicaciones residentes en segundo plano:
+  - Ubicado en la subcarpeta separada [`Scripts_Ejecucion_Manual/`](Cliente_Windows_ClickAndPlay/Scripts_Ejecucion_Manual/) para quienes no deseen aplicaciones residentes en segundo plano:
     - **`INSTALAR_IMPRESORA.bat`**: Registra la impresora en Windows Spooler.
     - **`REANUDAR_IMPRESORA.bat`**: Envía el comando de desbloqueo a la Raspberry Pi tras un atasco.
     - **`DESINSTALAR_IMPRESORA.bat`**: Retira la impresora del equipo.
@@ -164,14 +164,17 @@ El script se encarga de instalar paquetes, configurar `/etc/cups/cupsd.conf` con
 
 ### Distribución por Carpetas:
 * [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/): **Paquete Universal para Lectores.** No tiene IP prefijada; solicita la IP local de la Raspberry Pi en la primera ejecución y la guarda en `ip_servidor.txt`.
-* `Cliente_Windows_Privado/`: **Paquete Personal.** Preconfigurado con la IP fija del servidor doméstico para instalación desatendida.
+* `Cliente_Windows_Privado/`: **Paquete Personal.** Preconfigurado con la IP fija del servidor doméstico (`192.168.1.40`) para instalación 100% desatendida.
+
+> 💡 **Autonomía y Ejecución desde Pendrives USB:**  
+> **No necesitas copiar los archivos manualmente a tu disco duro antes de instalar.** Puedes ejecutar `INSTALAR_PRINT_SERVER_PI5.exe` directamente desde una memoria USB (Pendrive), una carpeta compartida de red o tu carpeta de Descargas. El propio instalador copiará de forma autónoma y permanente todos los archivos necesarios a `C:\Program Files\Print_Server_Pi5\`, registrará el acceso directo con icono pirata en el Menú Inicio y garantizará que el servicio arranque siempre con Windows aunque retires el USB.
 
 ### Pasos de Instalación:
-1. Abre la carpeta [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/).
+1. Abre la carpeta [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/) (o desde tu pendrive).
 2. **Método Recomendado (Con App de Bandeja):** Haz doble clic en **`INSTALAR_PRINT_SERVER_PI5.exe`** (icono de bandera pirata 🏴‍☠️).
    - Escribe la IP de tu Raspberry Pi cuando te lo solicite.
-   - La impresora quedará agregada y el monitor residente se iniciará junto al reloj.
-3. **Método Ligero (Solo Scripts):** Si no deseas software residente, ejecuta **`INSTALAR_IMPRESORA.bat`**.
+   - El instalador despliega los archivos en `C:\Program Files\Print_Server_Pi5\`, agrega la impresora y arranca el monitor residente junto al reloj.
+3. **Método Ligero (Solo Scripts sin instalar software):** Entra en la subcarpeta `Scripts_Ejecucion_Manual/` y ejecuta **`INSTALAR_IMPRESORA.bat`**.
 
 ---
 

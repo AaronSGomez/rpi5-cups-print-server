@@ -339,15 +339,15 @@
                         La carpeta <code>Cliente_Windows_ClickAndPlay</code> incluye el instalador paquetizado <strong><code>INSTALAR_PRINT_SERVER_PI5.exe</code></strong> con icono de bandera pirata, que configura todo en un solo paso:
                     </p>
                     <ol class="instruction-steps-list">
-                        <li>Copia la carpeta <code>Cliente_Windows_ClickAndPlay</code> en tu ordenador portátil o sobremesa.</li>
-                        <li>Haz doble clic sobre <strong><code>INSTALAR_PRINT_SERVER_PI5.exe</code></strong> (o <code>INSTALAR_IMPRESORA.bat</code>).</li>
+                        <li><strong>Ejecuta directamente:</strong> No necesitas copiar los archivos antes a tu disco duro; puedes abrir <code>INSTALAR_PRINT_SERVER_PI5.exe</code> directamente desde una memoria USB (Pendrive), red local o Descargas.</li>
                         <li>Acepta la elevación de privilegios de Administrador (UAC).</li>
                         <li>El instalador te solicitará la IP local de tu Raspberry Pi (si no existe <code>ip_servidor.txt</code>) y verificará la conectividad en el puerto 631.</li>
-                        <li>Instala la impresora con controlador nativo optimizado (PCLmS / Microsoft IPP).</li>
-                        <li>Registra y lanza de inmediato la aplicación de bandeja del sistema <strong><code>Print_Server_Pi5.exe</code></strong> junto al reloj.</li>
+                        <li><strong>Autodespliegue permanente:</strong> Copia automáticamente el software a <code>C:\Program Files\Print_Server_Pi5\</code>, crea el acceso directo en el Menú Inicio y configura el inicio automático.</li>
+                        <li>Instala la impresora en Windows con controlador nativo optimizado (PCLmS / Microsoft IPP).</li>
+                        <li>Lanza de inmediato la aplicación de bandeja del sistema <strong><code>Print_Server_Pi5.exe</code></strong> junto al reloj.</li>
                     </ol>
                     <div style="font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-secondary); padding: 0.75rem; border-left: 3px solid var(--accent-vermilion);">
-                        Tip: Si creas un archivo local <code>ip_servidor.txt</code> con tu IP en la carpeta, el instalador no te pedirá la IP y se instalará en modo 100% silencioso.
+                        Tip: Si ya tienes <code>ip_servidor.txt</code> con tu IP en la carpeta (como en Cliente_Windows_Privado), la instalación es 100% desatendida y tarda solo 2 segundos. Para control manual por lotes, consulta la subcarpeta <code>Scripts_Ejecucion_Manual/</code>.
                     </div>
                 </div>
 

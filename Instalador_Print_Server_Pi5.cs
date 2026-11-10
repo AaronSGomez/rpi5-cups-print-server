@@ -33,7 +33,7 @@ namespace PrintServerInstaller
                 if (!isSilent)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("[!] Solicitando permisos de Administrador para configurar la impresora...");
+                    Console.WriteLine("[!] Solicitando permisos de Administrador para instalar en el sistema...");
                 }
 
                 try
@@ -49,7 +49,7 @@ namespace PrintServerInstaller
                 catch
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("[X] Se requieren permisos de Administrador para instalar controladores de Windows.");
+                    Console.WriteLine("[X] Se requieren permisos de Administrador para instalar controladores y servicios.");
                     Console.ResetColor();
                     if (!isSilent) Console.ReadLine();
                     return;
@@ -61,23 +61,24 @@ namespace PrintServerInstaller
             Console.WriteLine("            🏴‍☠️  PRINT_SERVER_PI5 — INSTALADOR AUTOMATIZADO 🏴‍☠️       ");
             Console.WriteLine("=====================================================================");
             Console.ResetColor();
-            Console.WriteLine("Instalando de forma automatizada:");
-            Console.WriteLine("  • Impresora de red HP LaserJet M14-M17 (CUPS IPP)");
-            Console.WriteLine("  • Servicio de bandeja del sistema Print_Server_Pi5 con icono pirata");
-            Console.WriteLine("  • Notificaciones flotantes y desbloqueo de atascos en 1 clic");
-            Console.WriteLine("  • Inicio automático con Windows");
+            Console.WriteLine("Instalando permanentemente en este PC:");
+            Console.WriteLine("  1. Impresora de red HP LaserJet M14-M17 (CUPS IPP).");
+            Console.WriteLine("  2. Despliegue de archivos en C:\\Program Files\\Print_Server_Pi5\\.");
+            Console.WriteLine("  3. Servicio residente de bandeja (System Tray) con icono pirata.");
+            Console.WriteLine("  4. Notificaciones flotantes y desbloqueo de atascos en 1 clic.");
+            Console.WriteLine("  5. Acceso directo en el Menú Inicio y arranque con Windows.");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("=====================================================================");
             Console.ResetColor();
             Console.WriteLine();
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
-            string ipConfigFile = Path.Combine(appDir, "ip_servidor.txt");
+            string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+            string localIpFile = Path.Combine(currentDir, "ip_servidor.txt");
             string serverHost = "";
 
-            if (File.Exists(ipConfigFile))
+            if (File.Exists(localIpFile))
             {
-                serverHost = File.ReadAllText(ipConfigFile).Trim();
+                serverHost = File.ReadAllText(localIpFile).Trim();
             }
 
             // Si hay IP preconfigurada, instalar de forma 100% desatendida
@@ -89,10 +90,10 @@ namespace PrintServerInstaller
             }
             else
             {
-                // Solo si no existe ip_servidor.txt, pedirla una única vez
+                // Solo si no existe ip_servidor.txt, solicitarla
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Introduce la dirección IP local de tu Raspberry Pi (servidor CUPS):");
-                Console.WriteLine("(Ejemplo: 192.168.1.100 o la IP asignada en tu router)");
+                Console.WriteLine("(Ejemplo habitual: 192.168.1.100 o la IP asignada en tu router)");
                 Console.ResetColor();
 
                 while (string.IsNullOrEmpty(serverHost))
@@ -101,13 +102,13 @@ namespace PrintServerInstaller
                     serverHost = Console.ReadLine().Trim();
                 }
 
-                try { File.WriteAllText(ipConfigFile, serverHost); } catch {}
+                try { File.WriteAllText(localIpFile, serverHost); } catch {}
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("[OK] IP guardada en ip_servidor.txt");
+                Console.WriteLine("[OK] IP guardada para el instalador.");
                 Console.ResetColor();
             }
 
-            // 2. Comprobar conectividad
+            // 2. Comprobar conectividad con CUPS
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("[*] Comprobando conexión con " + serverHost + ":631... ");
             if (TestTcp(serverHost, 631))
@@ -123,9 +124,77 @@ namespace PrintServerInstaller
                 Console.ResetColor();
             }
 
-            // 3. Registrar Impresora en Windows Spooler
+            // 3. Crear directorio permanente en C:\Program Files\Print_Server_Pi5
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[*] Configurando cola de impresión en Windows...");
+            Console.WriteLine("[*] Instalando archivos en el disco duro del PC...");
+            Console.ResetColor();
+
+            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string targetDir = Path.Combine(programFiles, "Print_Server_Pi5");
+            try
+            {
+                try
+                {
+                    if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+                }
+                catch
+                {
+                    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    targetDir = Path.Combine(localAppData, "Print_Server_Pi5");
+                    if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+                }
+
+                // Copiar binarios principales
+                CopyFileIfExists(Path.Combine(currentDir, "Print_Server_Pi5.exe"), Path.Combine(targetDir, "Print_Server_Pi5.exe"));
+                CopyFileIfExists(Path.Combine(currentDir, "pirata.ico"), Path.Combine(targetDir, "pirata.ico"));
+                File.WriteAllText(Path.Combine(targetDir, "ip_servidor.txt"), serverHost);
+
+                // Copiar scripts de ejecución manual si existen
+                string manualSrc = Path.Combine(currentDir, "Scripts_Ejecucion_Manual");
+                string manualDst = Path.Combine(targetDir, "Scripts_Ejecucion_Manual");
+                if (Directory.Exists(manualSrc))
+                {
+                    if (!Directory.Exists(manualDst)) Directory.CreateDirectory(manualDst);
+                    foreach (string f in Directory.GetFiles(manualSrc))
+                    {
+                        File.Copy(f, Path.Combine(manualDst, Path.GetFileName(f)), true);
+                    }
+                }
+
+                // Generar script de desinstalación permanente en la carpeta de destino
+                string uninstallerBat = Path.Combine(targetDir, "DESINSTALAR.bat");
+                string uninstallerContent = 
+                    "@echo off\r\n" +
+                    "net session >nul 2>&1\r\n" +
+                    "if %errorLevel% neq 0 (\r\n" +
+                    "    powershell -Command \"Start-Process '%~f0' -Verb RunAs\"\r\n" +
+                    "    exit /b\r\n" +
+                    ")\r\n" +
+                    "echo [*] Deteniendo servicio...\r\n" +
+                    "taskkill /f /im Print_Server_Pi5.exe >nul 2>&1\r\n" +
+                    "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"Print_Server_Pi5\" /f >nul 2>&1\r\n" +
+                    "echo [*] Retirando impresora...\r\n" +
+                    "powershell -NoProfile -Command \"Remove-Printer -Name 'HP LaserJet M14-M17 (Red Hogar)' -ErrorAction SilentlyContinue\"\r\n" +
+                    "del \"%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Print_Server_Pi5.lnk\" >nul 2>&1\r\n" +
+                    "echo [OK] Impresora y servicio Print_Server_Pi5 desinstalados correctamente.\r\n" +
+                    "pause\r\n";
+                File.WriteAllText(uninstallerBat, uninstallerContent);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("[OK] Archivos desplegados con éxito en: " + targetDir);
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[!] Nota sobre copia de archivos: " + ex.Message);
+                Console.ResetColor();
+                targetDir = currentDir; // Fallback al directorio actual
+            }
+
+            // 4. Registrar Impresora en Windows Spooler
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("[*] Registrando impresora en Windows Spooler...");
             Console.ResetColor();
 
             string printerName = "HP LaserJet M14-M17 (Red Hogar)";
@@ -143,24 +212,47 @@ namespace PrintServerInstaller
                 "  $cmd = '/b \"' + $pName + '\" /x /n \"' + $pName + '\" /if /f \"\" /r \"' + $port + '\" /m \"' + $sel + '\"';\n" +
                 "  Start-Process 'rundll32.exe' -ArgumentList ('printui.dll,PrintUIEntry ' + $cmd) -Wait;\n" +
                 "}\n" +
-                "Write-Host '[OK] Impresora registrada con controlador: ' $sel -ForegroundColor Green;\n";
+                "Write-Host '[OK] Impresora configurada con controlador: ' $sel -ForegroundColor Green;\n";
 
             RunPowerShell(psScript);
 
-            // 4. Iniciar y registrar Print_Server_Pi5.exe en inicio automático
+            // 5. Crear acceso directo en el Menú Inicio de Windows
+            try
+            {
+                string startMenu = Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms);
+                string shortcutPath = Path.Combine(startMenu, "Print_Server_Pi5.lnk");
+                string installedExe = Path.Combine(targetDir, "Print_Server_Pi5.exe");
+                string installedIcon = Path.Combine(targetDir, "pirata.ico");
+
+                string vbsShortcutScript = 
+                    "$wsh = New-Object -ComObject WScript.Shell;\n" +
+                    "$s = $wsh.CreateShortcut('" + shortcutPath.Replace("'", "''") + "');\n" +
+                    "$s.TargetPath = '" + installedExe.Replace("'", "''") + "';\n" +
+                    "$s.WorkingDirectory = '" + targetDir.Replace("'", "''") + "';\n" +
+                    "$s.Description = 'Print_Server_Pi5 — HP LaserJet Monitor';\n" +
+                    (File.Exists(installedIcon) ? "$s.IconLocation = '" + installedIcon.Replace("'", "''") + "';\n" : "") +
+                    "$s.Save();\n";
+                RunPowerShell(vbsShortcutScript);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("[OK] Acceso directo registrado en el Menú Inicio de Windows.");
+                Console.ResetColor();
+            }
+            catch {}
+
+            // 6. Iniciar y registrar Print_Server_Pi5.exe en inicio automático con Windows
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("[*] Configurando servicio residente de bandeja del sistema...");
             Console.ResetColor();
 
-            string trayExe = Path.Combine(appDir, "Print_Server_Pi5.exe");
-            if (File.Exists(trayExe))
+            string targetTrayExe = Path.Combine(targetDir, "Print_Server_Pi5.exe");
+            if (File.Exists(targetTrayExe))
             {
                 try
                 {
-                    // Registro en inicio con Windows
                     using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
                     {
-                        rk.SetValue("Print_Server_Pi5", "\"" + trayExe + "\"");
+                        rk.SetValue("Print_Server_Pi5", "\"" + targetTrayExe + "\"");
                     }
 
                     // Detener cualquier instancia previa si existiera
@@ -169,10 +261,10 @@ namespace PrintServerInstaller
                         try { p.Kill(); } catch {}
                     }
 
-                    // Iniciar el monitor
+                    // Iniciar el monitor desde su ubicación permanente
                     Process.Start(new ProcessStartInfo() {
-                        FileName = trayExe,
-                        WorkingDirectory = appDir
+                        FileName = targetTrayExe,
+                        WorkingDirectory = targetDir
                     });
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -191,6 +283,7 @@ namespace PrintServerInstaller
             Console.WriteLine("     ¡INSTALACIÓN COMPLETADA DE FORMA EXITOSA!                       ");
             Console.WriteLine("=====================================================================");
             Console.ResetColor();
+            Console.WriteLine("• Ruta de instalación:  " + targetDir);
             Console.WriteLine("• Impresora configurada: " + printerName);
             Console.WriteLine("• Servicio activo:      Icono de bandera pirata en la barra de tareas.");
             Console.WriteLine("• En caso de atasco:     Clic derecho en el icono > Desbloquear y Reanudar.");
@@ -233,6 +326,13 @@ namespace PrintServerInstaller
                 }
             }
             catch { return false; }
+        }
+
+        static void CopyFileIfExists(string src, string dst)
+        {
+            try {
+                if (File.Exists(src)) File.Copy(src, dst, true);
+            } catch {}
         }
 
         static void RunPowerShell(string script)
