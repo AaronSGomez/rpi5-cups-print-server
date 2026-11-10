@@ -21,7 +21,7 @@ Guía paso a paso para imprimir documentos, fotos y correos desde teléfonos mó
 Para que el móvil o tablet se comunique con el servidor:
 - **Estar conectado a la misma red Wi-Fi** que la Raspberry Pi (habitualmente la red Wi-Fi de tu router de casa).
 - *Bandas 2.4 GHz y 5 GHz*: Puedes estar conectado a cualquiera de las dos; siempre que pertenezcan al mismo router local compartirán el direccionamiento (`192.168.1.x`).
-- **IP Cableada del Servidor:** La Raspberry Pi debe operar preferentemente por cable Ethernet para máxima estabilidad (`192.168.1.40`).
+- **IP Cableada del Servidor:** La Raspberry Pi debe operar preferentemente por cable Ethernet para máxima estabilidad (`192.168.1.XXX`).
 
 ---
 
@@ -39,7 +39,7 @@ Todos los dispositivos Android modernos (marcas como Samsung, Xiaomi, Google Pix
 4. Verás aparecer inmediatamente la impresora disponible en la red:
    ```text
    HP LaserJet Pro M14-M17
-   192.168.1.40 - Servidor Raspberry Pi 5
+   <IP_DEL_SERVIDOR> - Servidor Raspberry Pi 5
    ```
 5. ¡Listo! Ya puedes imprimir directamente desde cualquier app.
 
@@ -61,9 +61,9 @@ Si tu teléfono no detecta la impresora automáticamente, puedes vincularla dire
 2. Pulsa en los **tres puntos verticales (Menú)** arriba a la derecha.
 3. Selecciona **"Agregar impresora"** > **"Por dirección IP / Nombre de host"**.
 4. Introduce los datos de conexión:
-   * **Dirección IP del servidor:** `192.168.1.40`
+   * **Dirección IP del servidor:** `192.168.1.XXX`
    * *(O ruta IPP completa si la solicita)*:  
-     `http://192.168.1.40:631/printers/HP_LaserJet_M14_M17`
+     `http://<IP_DEL_SERVIDOR>:631/printers/HP_LaserJet_M14_M17`
 5. Pulsa **Guardar** o **Aceptar**. La impresora quedará registrada de forma permanente.
 
 ---
@@ -111,7 +111,7 @@ Cuando abras la pantalla de previsualización de impresión en tu móvil o table
 Abre tu navegador (Chrome, Safari, Edge, Firefox) e ingresa a:
 
 ```text
-http://192.168.1.40:631/jobs/
+http://<IP_DEL_SERVIDOR>:631/jobs/
 ```
 
 * **Trabajos en proceso:** Verás el ID del trabajo, nombre de archivo, usuario y tamaño.
@@ -174,9 +174,9 @@ flowchart LR
 
 ---
 
-### ❓ 3. En el móvil aparecía la IP `192.168.1.75` en vez de `192.168.1.40`
+### ❓ 3. En el móvil aparecía la IP `IP_WIFI_WLAN0` en vez de `192.168.1.XXX`
 * **Por qué ocurría:** La Raspberry Pi tenía tanto el cable Ethernet (`.40`) como la Wi-Fi integrada (`.75`) activadas a la vez. Avahi emitía anuncios por ambas interfaces y los móviles Wi-Fi captaban la `.75`.
-* **Solución aplicada:** Se ha configurado Avahi para usar exclusivamente `eth0` (`allow-interfaces=eth0`) y se ha desactivado la conexión Wi-Fi redundante. Ahora solo existe y se anuncia `192.168.1.40`.
+* **Solución aplicada:** Se ha configurado Avahi para usar exclusivamente `eth0` (`allow-interfaces=eth0`) y se ha desactivado la conexión Wi-Fi redundante. Ahora solo existe y se anuncia `192.168.1.XXX`.
 
 ---
 
@@ -191,10 +191,10 @@ flowchart LR
 | Parámetro | Valor para Clientes |
 | :--- | :--- |
 | **Nombre de Cola** | `HP_LaserJet_M14_M17` |
-| **IP del Servidor** | `192.168.1.40` (Ethernet Cable) |
+| **IP del Servidor** | `192.168.1.XXX` (Ethernet Cable) |
 | **Puerto IPP** | `631` |
-| **URL IPP Directa** | `http://192.168.1.40:631/printers/HP_LaserJet_M14_M17` |
-| **Monitor Web de Trabajos** | `http://192.168.1.40:631/jobs/` |
+| **URL IPP Directa** | `http://<IP_DEL_SERVIDOR>:631/printers/HP_LaserJet_M14_M17` |
+| **Monitor Web de Trabajos** | `http://<IP_DEL_SERVIDOR>:631/jobs/` |
 | **Protocolo de difusión** | mDNS / DNS-SD (Avahi en `eth0`) |
 | **Compatibilidad Móvil** | Apple AirPrint Nativo & Android Mopria 1.3 |
 | **Tamaño Predeterminado** | A4 (210 x 297 mm) — Ajuste a márgenes |
