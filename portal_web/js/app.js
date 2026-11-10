@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initOsTabs();
     initInteractiveTerminal();
     initClipboardCopy();
+    initCupsNodeConnector();
 });
 
 /* -----------------------------------------------------------------------------
@@ -369,4 +370,114 @@ function initDynamicCopyButtons() {
             });
         });
     });
+}
+
+
+/* -----------------------------------------------------------------------------
+   7. GESTOR DE NODO LOCAL & ACCESO A COLAS (LOCALSTORAGE SOVEREIGN PRIVACY)
+   ----------------------------------------------------------------------------- */
+function initCupsNodeConnector() {
+    const ipInput = document.getElementById("cups-node-ip-input");
+    const saveBtn = document.getElementById("save-node-ip-btn");
+    const clearBtn = document.getElementById("clear-node-ip-btn");
+    const btnJobs = document.getElementById("btn-open-jobs");
+    const btnPrinter = document.getElementById("btn-open-printer");
+    const statusBadge = document.getElementById("cups-node-status-badge");
+
+    if (!ipInput) return;
+
+    // Cargar IP guardada previamente en el navegador del usuario (sin fuga pública)
+    const savedIp = localStorage.getItem("printcore_node_ip") || "";
+    if (savedIp) {
+        ipInput.value = savedIp;
+        updateBadge(savedIp);
+    }
+
+    function updateBadge(ip) {
+        if (!statusBadge) return;
+        if (ip) {
+            statusBadge.textContent = `● NODO CONFIGURADO: http://${ip}:631`;
+            statusBadge.style.color = "#10B981";
+            if (clearBtn) clearBtn.style.display = "inline-flex";
+        } else {
+            statusBadge.textContent = "○ NODO NO ASIGNADO // ALMACENAMIENTO LOCAL VACÍO";
+            statusBadge.style.color = "var(--ink-muted)";
+            if (clearBtn) clearBtn.style.display = "none";
+        }
+    }
+
+    function saveIp() {
+        let val = ipInput.value.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/:631.*$/, "");
+        if (val) {
+            localStorage.setItem("printcore_node_ip", val);
+            ipInput.value = val;
+            updateBadge(val);
+            if (saveBtn) {
+                const orig = saveBtn.textContent;
+                saveBtn.textContent = "[ GUARDADO ✓ ]";
+                saveBtn.style.background = "#10B981";
+                saveBtn.style.color = "#FFFFFF";
+                setTimeout(() => {
+                    saveBtn.textContent = orig;
+                    saveBtn.style.background = "";
+                    saveBtn.style.color = "";
+                }, 1800);
+            }
+            return val;
+        } else {
+            localStorage.removeItem("printcore_node_ip");
+            updateBadge("");
+            return "";
+        }
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener("click", saveIp);
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            localStorage.removeItem("printcore_node_ip");
+            ipInput.value = "";
+            updateBadge("");
+            ipInput.focus();
+        });
+    }
+
+    ipInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            saveIp();
+        }
+    });
+
+    function navigateTo(path) {
+        let ip = ipInput.value.trim() || localStorage.getItem("printcore_node_ip");
+        if (!ip) {
+            ip = prompt("Introduce la IP local o hostname de tu Raspberry Pi (ej: 192.168.1.100 o printserver.local):");
+            if (ip) {
+                ip = ip.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/:631.*$/, "");
+                ipInput.value = ip;
+                saveIp();
+            } else {
+                return;
+            }
+        } else {
+            saveIp();
+        }
+        window.open(`http://${ip}:631${path}`, "_blank", "noopener,noreferrer");
+    }
+
+    if (btnJobs) {
+        btnJobs.addEventListener("click", (e) => {
+            e.preventDefault();
+            navigateTo("/jobs/");
+        });
+    }
+
+    if (btnPrinter) {
+        btnPrinter.addEventListener("click", (e) => {
+            e.preventDefault();
+            navigateTo("/printers/HP_LaserJet_M14_M17");
+        });
+    }
 }

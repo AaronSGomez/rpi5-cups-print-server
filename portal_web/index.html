@@ -483,90 +483,190 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
             </div>
         </div>
 
-        <!-- Banner de Gestión Web de CUPS (Patrón de Seguridad & Cero Fugas de Infraestructura) -->
-        <div style="background: var(--bg-surface); border: 2px solid var(--border-strong); padding: 2rem; margin-bottom: 2.5rem; box-shadow: 4px 4px 0px var(--border-strong);">
-            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.5rem;">
-                [ GESTIÓN DE COLA EN RED LOCAL // PRINCIPIO DE SEGURIDAD PERIMETRAL ]
-            </div>
-            <h3 style="font-family: var(--font-display); font-size: 1.45rem; margin-bottom: 0.5rem; color: var(--ink-primary);">
-                Panel de Administración & Monitor de Trabajos CUPS
-            </h3>
-            <p style="color: var(--ink-secondary); font-size: 0.95rem; max-width: 800px; margin-bottom: 1.25rem; line-height: 1.5;">
-                Por principios de mínimo privilegio y prevención de reconocimiento externo (OPSEC), el planificador CUPS solo escucha en la subred privada local (LAN). Para consultar trabajos activos, historiales o cancelar documentos atascados desde tu navegador, utiliza la dirección privada de tu nodo:
-            </p>
-            <div style="background: var(--bg-code); color: #F4F3EF; padding: 1.15rem; font-family: var(--font-mono); font-size: 0.85rem; border-radius: var(--radius-sm); display: flex; flex-direction: column; gap: 0.65rem;">
-                <div>
-                    <span style="color: #9CA3AF;"># 1. Monitor de trabajos en cola (desde tu navegador local):</span><br>
-                    <code style="color: #34D399; font-size: 0.95rem;">http://&lt;IP_LOCAL_RASPBERRY_PI&gt;:631/jobs/</code>
-                    <span style="color: #6B7280; margin: 0 0.5rem;">o</span>
-                    <code style="color: #60A5FA; font-size: 0.95rem;">http://&lt;NOMBRE_NODO&gt;.local:631/jobs/</code>
+        <!-- Conector Interactivo de Cola Web (Client-Side con LocalStorage // Cero Fugas OPSEC) -->
+        <div style="background: var(--bg-surface); border: 2px solid var(--border-strong); padding: 2rem; margin-bottom: 3rem; box-shadow: 4px 4px 0px var(--border-strong);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700;">
+                    [ CONECTOR DE COLA EN TIEMPO REAL // ZERO-KNOWLEDGE LOCALSTORAGE ]
                 </div>
-                <div style="margin-top: 0.25rem;">
-                    <span style="color: #9CA3AF;"># 2. Panel de estado de la cola de impresión:</span><br>
-                    <code style="color: #FBBF24; font-size: 0.95rem;">http://&lt;IP_LOCAL_RASPBERRY_PI&gt;:631/printers/HP_LaserJet_M14_M17</code>
+                <div id="cups-node-status-badge" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); font-weight: 700;">
+                    ○ NODO NO ASIGNADO // ALMACENAMIENTO LOCAL VACÍO
+                </div>
+            </div>
+
+            <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--ink-primary);">
+                Panel Web de Administración & Cola CUPS
+            </h3>
+            <p style="color: var(--ink-secondary); font-size: 0.95rem; max-width: 850px; margin-bottom: 1.5rem; line-height: 1.5;">
+                Para mantener la máxima privacidad sin exponer direcciones IP privadas en el código público, este portal almacena la dirección de tu Raspberry Pi <strong>exclusivamente en el LocalStorage de tu navegador</strong>. Introduce la IP o nombre de host mDNS de tu servidor local para abrir de inmediato el gestor de trabajos.
+            </p>
+
+            <!-- Barra de Configuración de IP -->
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; background: var(--bg-secondary); padding: 1rem; border: 1px solid var(--border-subtle);">
+                <label for="cups-node-ip-input" style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--ink-primary);">IP / HOST DEL SERVIDOR:</label>
+                <input type="text" id="cups-node-ip-input" placeholder="ej: 192.168.1.100 o printserver.local" style="flex: 1; min-width: 240px; padding: 0.65rem 0.85rem; font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-surface); color: var(--ink-primary); border: 1px solid var(--border-strong); outline: none;">
+                <button type="button" id="save-node-ip-btn" class="btn-industrial" style="padding: 0.65rem 1.25rem; font-size: 0.8rem; font-weight: 700;">GUARDAR EN NAVEGADOR</button>
+                <button type="button" id="clear-node-ip-btn" class="btn-industrial btn-outline" style="padding: 0.65rem 1rem; font-size: 0.8rem; display: none;">BORRAR</button>
+            </div>
+
+            <!-- Botones de Acción hacia la Cola -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="#" id="btn-open-jobs" class="btn-industrial btn-primary-vermilion">
+                    <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>VER TRABAJOS EN COLA</span>
+                    <span style="font-family: var(--font-mono);">&rarr;</span>
+                </a>
+                <a href="#" id="btn-open-printer" class="btn-industrial btn-outline">
+                    <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <span>ESTADO DE IMPRESORA</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+             SUBSECCIÓN 6.1: FALLOS ESPECÍFICOS HP LASERJET PRO M14-M17
+             ------------------------------------------------------------------- -->
+        <div style="margin-bottom: 3.5rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 1.25rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 800; color: var(--accent-vermilion);">6.1</span>
+                <h3 style="font-family: var(--font-display); font-size: 1.35rem; color: var(--ink-primary); margin: 0;">
+                    Diagnóstico Especializado: HP LaserJet Pro M14-M17 (HBPL1 / ZjStream)
+                </h3>
+            </div>
+            <p style="color: var(--ink-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Resolución exhaustiva de los comportamientos y anomalías documentados en la unidad física de referencia conectada al servidor:
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <!-- Tarjeta 1: Márgenes y A4 -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ FORMATO DE PÁGINA ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Ajuste a A4 y Eliminación de Marcos Blancos</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        Si el documento se imprime con marcos indeseados o contenido encogido, se debe al desfase entre el tamaño <em>Letter (Carta americana: 215.9 x 279.4 mm)</em> y <em>A4 (Europeo: 210 x 297 mm)</em>.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li><strong>En el Servidor:</strong> Configurado con <code>PageSize=A4</code>, <code>media=A4</code> y <code>fit-to-page=true</code>.</li>
+                        <li><strong>En el Móvil / Tablet:</strong> En la ventana de previsualización de impresión, despliega <em>Más opciones</em>, selecciona tamaño <strong>A4</strong> y marca la opción <strong>"Ajustar al área de impresión"</strong> o <strong>"Rellenar página"</strong>.</li>
+                    </ul>
+                </div>
+
+                <!-- Tarjeta 2: Cifrado y Desencriptado -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ SEGURIDAD & TLS ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Aviso: "Esta impresora no acepta trabajos encriptados"</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        Android recuerda si una impresora intentó usar TLS anteriormente. Al pasar al modo IPP en claro (para evitar certificados autofirmados rotos), el sistema pide confirmación preventiva.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li>Pulsa <strong>"Continuar"</strong> o <strong>"Aceptar"</strong> en la pantalla del móvil para autorizar la impresión.</li>
+                        <li>Para no volver a ver el aviso: en <em>Ajustes &gt; Impresión</em>, pulsa en la impresora, elige <strong>Olvidar</strong> y vuelve a buscarla de cero.</li>
+                    </ul>
+                </div>
+
+                <!-- Tarjeta 3: Luz Naranja y Bloqueo -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ HARDWARE & SENSORES ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Luz Naranja Parpadeante / Impresora Bloqueada</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        La HP LaserJet M14-M17 entra en pausa si detecta tóner en mínimos (código 1601), falta de papel en la bandeja o tras solventar un atasco.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li><strong>Botón Reanudar:</strong> Presiona el botón frontal con el icono de la <strong>hoja de papel / flecha</strong> para autorizar la tirada con tóner bajo.</li>
+                        <li><strong>Atasco de papel:</strong> Abre la compuerta superior, extrae el cartucho de tóner, retira la hoja atascada suavemente y vuelve a cerrar.</li>
+                    </ul>
+                </div>
+
+                <!-- Tarjeta 4: Control desde Consola PC -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ AUTOMATIZACIÓN PC ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Comandos de Gestión Remota desde PC (deploy_remote.py)</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        Interactúa directamente con la cola CUPS desde la terminal de Windows sin necesidad de abrir la interfaz web:
+                    </p>
+                    <div style="background: var(--bg-code); color: #F4F3EF; padding: 0.85rem; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6; border-radius: var(--radius-sm);">
+                        <div style="color: #9CA3AF;"># Ver trabajos activos y completados:</div>
+                        <div style="color: #34D399;">python deploy_remote.py --jobs</div>
+                        <div style="color: #9CA3AF; margin-top: 0.4rem;"># Purgar y limpiar cola atascada:</div>
+                        <div style="color: #34D399;">python deploy_remote.py --clear-jobs</div>
+                        <div style="color: #9CA3AF; margin-top: 0.4rem;"># Desbloquear cola suspendida:</div>
+                        <div style="color: #34D399;">python deploy_remote.py --unstick</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Matriz de Problemas Frecuentes y Soluciones -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 1.5rem;">
-            
-            <!-- Tarjeta 1: Márgenes y A4 -->
-            <div class="client-instruction-box">
-                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ FORMATO DE PÁGINA ]</div>
-                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Ajuste a A4 y Eliminación de Marcos Blancos</h3>
-                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
-                    Si el documento se imprime con marcos indeseados o contenido encogido, se debe al desfase entre el tamaño <em>Letter (Carta americana)</em> y <em>A4 (Europeo)</em>.
-                </p>
-                <ul class="instruction-steps-list" style="font-size: 0.9rem;">
-                    <li><strong>En el Servidor:</strong> Configurado con <code>PageSize=A4</code>, <code>media=A4</code> y <code>fit-to-page=true</code>.</li>
-                    <li><strong>En el Móvil / Tablet:</strong> En la ventana de previsualización de impresión, despliega <em>Más opciones</em>, selecciona tamaño <strong>A4</strong> y marca la opción <strong>"Ajustar al área de impresión"</strong> o <strong>"Rellenar página"</strong>.</li>
-                </ul>
+        <!-- -------------------------------------------------------------------
+             SUBSECCIÓN 6.2: COMPORTAMIENTO & ERRORES EN OTROS FABRICANTES
+             ------------------------------------------------------------------- -->
+        <div>
+            <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 1.25rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 800; color: var(--accent-blue);">6.2</span>
+                <h3 style="font-family: var(--font-display); font-size: 1.35rem; color: var(--ink-primary); margin: 0;">
+                    Comportamiento & Errores Frecuentes en Otras Marcas (Brother, Epson, Canon, Xerox)
+                </h3>
             </div>
+            <p style="color: var(--ink-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Cada fabricante implementa controladores y estados de ahorro de energía diferentes. Si despliegas este servidor con otra impresora, estos son los fallos característicos:
+            </p>
 
-            <!-- Tarjeta 2: Cifrado y Desencriptado -->
-            <div class="client-instruction-box">
-                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ SEGURIDAD & TLS ]</div>
-                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Aviso: "Esta impresora no acepta trabajos encriptados"</h3>
-                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
-                    Android recuerda si una impresora intentó usar TLS anteriormente. Al pasar al modo IPP en claro (para evitar certificados autofirmados rotos), el sistema pide confirmación preventiva.
-                </p>
-                <ul class="instruction-steps-list" style="font-size: 0.9rem;">
-                    <li>Pulsa <strong>"Continuar"</strong> o <strong>"Aceptar"</strong> en la pantalla del móvil para autorizar la impresión.</li>
-                    <li>Para no volver a ver el aviso: en <em>Ajustes &gt; Impresión</em>, pulsa en la impresora, elige <strong>Olvidar</strong> y vuelve a buscarla de cero.</li>
-                </ul>
-            </div>
-
-            <!-- Tarjeta 3: Luz Naranja y Bloqueo -->
-            <div class="client-instruction-box">
-                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ HARDWARE & SENSORES ]</div>
-                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Luz Naranja Parpadeante / Impresora Bloqueada</h3>
-                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
-                    La HP LaserJet M14-M17 entra en pausa si detecta tóner en mínimos (código 1601), falta de papel en la bandeja o tras solventar un atasco.
-                </p>
-                <ul class="instruction-steps-list" style="font-size: 0.9rem;">
-                    <li><strong>Botón Reanudar:</strong> Presiona el botón frontal con el icono de la <strong>hoja de papel / flecha</strong> para autorizar la tirada con tóner bajo.</li>
-                    <li><strong>Atasco de papel:</strong> Abre la compuerta superior, extrae el cartucho de tóner, retira la hoja atascada suavemente y vuelve a cerrar.</li>
-                </ul>
-            </div>
-
-            <!-- Tarjeta 4: Control desde Consola PC -->
-            <div class="client-instruction-box">
-                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ AUTOMATIZACIÓN PC ]</div>
-                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Comandos de Gestión Remota desde PC (deploy_remote.py)</h3>
-                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
-                    Interactúa directamente con la cola CUPS desde la terminal de Windows sin necesidad de abrir la interfaz web:
-                </p>
-                <div style="background: var(--bg-code); color: #F4F3EF; padding: 0.85rem; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6; border-radius: var(--radius-sm);">
-                    <div style="color: #9CA3AF;"># Ver trabajos activos y completados:</div>
-                    <div style="color: #34D399;">python deploy_remote.py --jobs</div>
-                    <div style="color: #9CA3AF; margin-top: 0.4rem;"># Purgar y limpiar cola atascada:</div>
-                    <div style="color: #34D399;">python deploy_remote.py --clear-jobs</div>
-                    <div style="color: #9CA3AF; margin-top: 0.4rem;"># Desbloquear cola suspendida:</div>
-                    <div style="color: #34D399;">python deploy_remote.py --unstick</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                
+                <!-- Brother -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 0.35rem;">[ FABRICANTE: BROTHER ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Brother (HL / DCP Series — ej. HL-L2300D, DCP-L2520DW)</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        <strong>Fallo 1 (Deep Sleep):</strong> La impresora entra en suspensión profunda desconectando la interfaz USB/red y arrojando <em>"Destination Host Unreachable"</em> en CUPS.<br>
+                        <strong>Fallo 2 (Replace Drum):</strong> El contador físico del tambor se bloquea a las 12.000 copias impidiendo imprimir aunque el tóner esté lleno.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li><strong>Controlador recomendado:</strong> Instalar <code>printer-driver-brlaser</code> (mucho más rápido y estable en ARM64 que los binarios oficiales de Brother).</li>
+                        <li><strong>Solución Drum:</strong> Resetear el contador en la botonera de la impresora (mantener botón <em>Go</em> 4 segundos con la tapa abierta).</li>
+                    </ul>
                 </div>
-            </div>
 
+                <!-- Epson -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 0.35rem;">[ FABRICANTE: EPSON ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Epson (EcoTank & WorkForce — ej. L3150, ET-2750)</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        <strong>Fallo 1 (Ink Pad End of Life):</strong> Las impresoras de inyección cuentan con almohadillas de tinta residual. Al alcanzar el límite programado en firmware, el dispositivo se bloquea completamente por software.<br>
+                        <strong>Fallo 2 (Inyectores obstruidos):</strong> En servidores que imprimen poco, la tinta se seca dejando hojas en blanco.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li><strong>Controlador recomendado:</strong> Paquete <code>printer-driver-escpr</code>.</li>
+                        <li><strong>Mantenimiento terminal:</strong> Emplear la utilidad <code>escputil --clean-head -r /dev/usb/lp0</code> para purgar cabezales sin interfaz gráfica.</li>
+                    </ul>
+                </div>
+
+                <!-- Canon -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 0.35rem;">[ FABRICANTE: CANON ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Canon (PIXMA, i-SENSYS & imageCLASS — CAPT / UFR II)</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        <strong>Fallo 1 (Filter Failed en ARM64):</strong> Canon históricamente solo proporciona controladores binarios propietarios compilados para arquitecturas x86_64. Al intentar ejecutar <code>captfilter</code> en Raspberry Pi 5 (ARM64), CUPS falla de inmediato.<br>
+                        <strong>Fallo 2 (Reconexión USB perdida):</strong> El protocolo propietario CAPT no tolera desconexiones en caliente del cable USB.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li><strong>Solución:</strong> Priorizar modelos de red compatibles con <strong>IPP Everywhere / Driverless</strong> para no depender de librerías propietarias de Canon.</li>
+                    </ul>
+                </div>
+
+                <!-- Samsung / Xerox -->
+                <div class="client-instruction-box">
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 0.35rem;">[ FABRICANTE: SAMSUNG / XEROX ]</div>
+                    <h4 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: var(--ink-primary);">Samsung & Xerox (Phaser & Xpress — ej. M2020W, Phaser 3020)</h4>
+                    <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                        <strong>Fallo 1 (SPL Error Timeout):</strong> Utilizan el lenguaje propietario SPL (Samsung Printer Language). Si se envían PDFs con fuentes vectoriales complejas sin rasterizado previo, la máquina expulsa una hoja con el error <em>"SPL ERROR: - Incomplete Session by time out"</em>.<br>
+                        <strong>Fallo 2 (Consumo de RAM):</strong> Renderizar a 1200 dpi puede saturar la memoria temporal del spooler.
+                    </p>
+                    <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                        <li><strong>Controlador recomendado:</strong> Instalar <code>printer-driver-splix</code> o <code>foo2qpdl</code> con resolución fija a 600 dpi.</li>
+                    </ul>
+                </div>
+
+            </div>
         </div>
     </section>
 
