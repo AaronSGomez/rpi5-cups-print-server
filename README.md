@@ -176,10 +176,9 @@ El script se encarga de instalar paquetes, configurar `/etc/cups/cupsd.conf` con
    - El instalador despliega los archivos en `C:\Program Files\Print_Server_Pi5\`, agrega la impresora y arranca el monitor residente junto al reloj.
 3. **Método Ligero (Solo Scripts sin instalar software):** Entra en la subcarpeta `Scripts_Ejecucion_Manual/` y ejecuta **`INSTALAR_IMPRESORA.bat`**.
 
-<div align="center">
-  <img src="portal_web/assets/servicio.png" alt="Servicio Print_Server_Pi5 en segundo plano y cola web CUPS" width="850">
-  <p><em>Servicio <code>Print_Server_Pi5</code> activo en la bandeja del sistema de Windows (junto al reloj) y consola web de administración CUPS.</em></p>
-</div>
+| Monitorización en Segundo Plano | Captura de Servicio & Cola CUPS |
+| :--- | :--- |
+| **Bandeja del Sistema (System Tray):**<br>El monitor residente `Print_Server_Pi5` se mantiene activo junto al reloj de Windows. Notifica eventos de impresión en tiempo real y permite desbloquear la cola CUPS con 1 solo clic en caso de atasco mecánico o pausa por falta de papel. | <img src="portal_web/assets/servicio.png" alt="Servicio Print_Server_Pi5 en bandeja y cola web CUPS" width="340"> |
 
 ---
 

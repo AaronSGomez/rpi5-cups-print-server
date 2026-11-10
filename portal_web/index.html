@@ -404,22 +404,27 @@
                     <div><span style="color: #A78BFA; font-weight: 700;">Scripts_Ejecucion_Manual/</span>       <span style="color: #9CA3AF;">-&gt; Subcarpeta separada con scripts .bat y PowerShell manuales.</span></div>
                 </div>
 
-                <!-- Captura de Producción: Servicio en Bandeja de Windows & Cola Web CUPS -->
-                <div style="margin-top: 1.5rem; border: 1px solid var(--border-strong); background: var(--bg-surface); padding: 1.25rem; box-shadow: 4px 4px 0px var(--border-strong);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
-                            <img src="assets/favicon.png" alt="Icono Pirata" style="width: 14px; height: 14px;">
-                            CAPTURA EN WINDOWS // SERVICIO EN BANDEJA &amp; GESTIÓN WEB CUPS
-                        </span>
-                        <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-muted); background: var(--bg-secondary); padding: 0.2rem 0.5rem; border: 1px solid var(--border-subtle);">
-                            HOST: WINDOWS 10 / 11 &amp; RASPBERRY PI 5
-                        </span>
-                    </div>
-                    <div style="border: 1px solid var(--border-subtle); overflow: hidden; background: #000; border-radius: 2px;">
-                        <img src="assets/servicio.png" alt="Servicio Print_Server_Pi5 activo en la bandeja del sistema y cola web de CUPS" style="width: 100%; height: auto; display: block;">
-                    </div>
-                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-secondary); margin-top: 0.75rem; line-height: 1.5;">
-                        <strong style="color: var(--ink-primary);">Vista en ejecución real:</strong> En el área de notificación (System Tray) junto al reloj de Windows se encuentra activo el monitor residente <strong>Print_Server_Pi5</strong> (<img src="assets/favicon.png" alt="Icono" style="width: 14px; height: 14px; vertical-align: -2px;">). En paralelo, la interfaz web de CUPS muestra el estado y avance de las tareas de impresión de la red en tiempo real.
+                <!-- Captura de Producción: Servicio en Bandeja de Windows & Cola Web CUPS (Compacto) -->
+                <div style="margin-top: 1.25rem; border: 1px solid var(--border-strong); background: var(--bg-surface); padding: 1.1rem 1.25rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: center;">
+                        <div>
+                            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                <img src="assets/favicon.png" alt="Icono Pirata" style="width: 14px; height: 14px;">
+                                SERVICIO EN BANDEJA &amp; GESTIÓN WEB CUPS
+                            </div>
+                            <h4 style="font-family: var(--font-display); font-size: 1.05rem; color: var(--ink-primary); margin-bottom: 0.45rem;">
+                                Monitorización Activa en Segundo Plano
+                            </h4>
+                            <p style="font-size: 0.85rem; color: var(--ink-secondary); line-height: 1.55; margin-bottom: 0.4rem;">
+                                En el área de notificación (junto al reloj de Windows) se mantiene residente el icono de <strong>Print_Server_Pi5</strong> (<img src="assets/favicon.png" alt="Icono" style="width: 13px; height: 13px; vertical-align: -2px;">), supervisando las tareas enviadas en tiempo real.
+                            </p>
+                            <p style="font-size: 0.82rem; color: var(--ink-muted); line-height: 1.5; margin: 0;">
+                                Permite consultar los estados o desbloquear la cola CUPS en caso de pausa por atasco o falta de papel con 1 solo clic.
+                            </p>
+                        </div>
+                        <div style="border: 1px solid var(--border-subtle); background: #000; border-radius: 3px; overflow: hidden; box-shadow: 2px 2px 0px var(--border-strong); max-width: 350px; justify-self: center;">
+                            <img src="assets/servicio.png" alt="Servicio Print_Server_Pi5 activo en la bandeja del sistema y cola web de CUPS" style="width: 100%; height: auto; display: block;">
+                        </div>
                     </div>
                 </div>
             </div>
