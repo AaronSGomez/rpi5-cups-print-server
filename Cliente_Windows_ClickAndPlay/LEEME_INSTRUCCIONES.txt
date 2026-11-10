@@ -1,46 +1,64 @@
 =============================================================================
 🏴‍☠️ CLIENTE WINDOWS 10 / 11 CLICK & PLAY — PRINT_SERVER_PI5
 =============================================================================
+Guía de uso para lectores y usuarios: elige cómo prefieres usar la impresora.
 
-Este paquete contiene el sistema completo de impresión, monitorización y
-recuperación de atascos para el servidor Raspberry Pi 5.
+Tienes DOS formas de utilizar este paquete según tus preferencias:
 
------------------------------------------------------------------------------
-1. INSTALACIÓN TODO EN UNO (1 CLIC):
------------------------------------------------------------------------------
-   Haz doble clic sobre el ejecutable con icono de bandera pirata:
+=============================================================================
+MODO 1 (RECOMENDADO): INSTALADOR TODO EN UNO Y SERVICIO EN BANDEJA
+=============================================================================
+Si deseas tener la experiencia completa con notificaciones flotantes y
+desbloqueo de atascos en 1 solo clic:
+
+1. Haz doble clic en el archivo con icono de bandera pirata:
    👉 INSTALAR_PRINT_SERVER_PI5.exe
-      (o sobre INSTALAR_IMPRESORA.bat)
 
-   ¿Qué hace automáticamente?
-   • Te solicitará la IP local de tu Raspberry Pi (si no existe ip_servidor.txt).
-   • Probará la conexión con el puerto 631 de CUPS.
-   • Instalará la impresora HP LaserJet M14-M17 en tu Spooler de Windows.
-   • Configurará e iniciará el monitor de bandeja del sistema Print_Server_Pi5.exe.
-   • Configurará el auto-arranque con Windows (Startup).
+2. ¿Qué hará este instalador?
+   • Te pedirá la dirección IP local de tu Raspberry Pi (ej: 192.168.1.100).
+   • Probará la conectividad en el puerto 631 de CUPS.
+   • Guardará tu IP en ip_servidor.txt para no volver a pedírtela.
+   • Instalará automáticamente la impresora en tu Windows (driver PCLmS / IPP).
+   • Configurará e iniciará el servicio residente Print_Server_Pi5.exe en
+     la bandeja del sistema (junto al reloj).
+   • Activará el inicio automático con Windows.
    • Te permitirá enviar una página de prueba.
 
------------------------------------------------------------------------------
-2. SERVICIO EN LA BANDEJA DEL SISTEMA (JUNTO AL RELOJ):
------------------------------------------------------------------------------
-   Una vez instalado, verás el icono pirata en la barra de tareas de Windows.
-   • Notificaciones flotantes automáticas:
+3. ¿Qué ventajas te da el servicio residente (icono pirata junto al reloj)?
+   • Notificaciones flotantes (Toasts):
        - 🖨️ "Imprimiendo documento" al enviar la orden.
-       - ✅ "Impresión Completada con Éxito" cuando la hoja sale físicamente.
-       - ⚠️ "ATASCO O ERROR DE IMPRESIÓN" con sonido de alarma ante atascos.
-
+       - ✅ "Impresión Completada con Éxito" cuando la hoja sale del rodillo.
+       - ⚠️ "ATASCO O ERROR DE IMPRESIÓN" con sonido de alerta si la cola se detiene.
    • Menú con clic derecho en el icono pirata:
-       - 🟢 Estado en vivo de la impresora.
-       - ⚡ "Desbloquear y Reanudar Impresora": ¡1 solo clic para reactivar CUPS tras sacar el papel!
-       - 🧹 "Cancelar trabajos atascados": para purgar la cola si una hoja se rompió.
-       - 📋 "Ver Cola de Trabajos (Web CUPS)": acceso directo al navegador.
-       - ⚙️ "Cambiar IP del Servidor": si cambias de router o de IP.
-       - 🔄 "Iniciar con Windows": activa o desactiva el inicio automático.
+       - ⚡ "Desbloquear y Reanudar Impresora": ¡1 clic para reanudar tras un atasco!
+       - 🧹 "Cancelar trabajos atascados": para purgar la cola si se dañó el papel.
+       - 📋 "Ver Cola de Trabajos (Web CUPS)": abre el visor web oficial.
+       - ⚙️ "Cambiar IP del Servidor": si cambias de red o de router.
+       - 🔄 "Iniciar con Windows": activa o desactiva el arranque automático.
        - ❌ "Salir": cierra el monitor.
 
------------------------------------------------------------------------------
-3. DESINSTALACIÓN:
------------------------------------------------------------------------------
-   Si en algún momento deseas retirar la impresora de un equipo temporal,
-   haz doble clic en "DESINSTALAR_IMPRESORA.bat".
+
+=============================================================================
+MODO 2: MODO LIGERO / SCRIPTS POR LOTES (SIN SOFTWARE RESIDENTE)
+=============================================================================
+Si NO deseas tener ninguna aplicación abierta en la bandeja del sistema
+y solo quieres instalar la impresora y gestionar la cola mediante scripts:
+
+1. Instalación de la impresora:
+   • Haz doble clic en 👉 INSTALAR_IMPRESORA.bat
+   • Introduce la IP de tu servidor cuando te lo solicite.
+
+2. En caso de atasco de papel:
+   • Retira la hoja atascada de la impresora y cierra la tapa.
+   • Haz doble clic en 👉 REANUDAR_IMPRESORA.bat para reanudar la cola.
+
+3. Scripts de control manual del monitor (opcionales):
+   • INICIAR_Print_Server_Pi5.bat: arranca el monitor manualmente.
+   • DETENER_Print_Server_Pi5.bat: cierra el monitor.
+   • ACTIVAR_INICIO_AUTOMATICO.bat: añade el monitor al arranque de Windows.
+   • DESACTIVAR_INICIO_AUTOMATICO.bat: quita el monitor del arranque.
+   • PROBAR_NOTIFICACIONES.bat: prueba los 3 avisos emergentes en pantalla.
+
+4. Desinstalación:
+   • Haz doble clic en 👉 DESINSTALAR_IMPRESORA.bat para retirar la impresora.
 =============================================================================

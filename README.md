@@ -12,7 +12,7 @@
 
 > **Resumen Ejecutivo**:  
 > Solución integral, ligera y automatizada para transformar una **Raspberry Pi 5 (8 GB RAM, ARM64 / Debian Linux)** en un servidor de impresión local de alto rendimiento y alta disponibilidad. Conecta y gestiona de forma centralizada impresoras USB de la gama **HP LaserJet serie M14-M17** (incluyendo M15a, M15w, M28a y equivalentes basados en HPLIP/hpcups).  
-> El sistema implementa descubrimiento nativo **Zero-Config** para dispositivos móviles (**Android Mopria / Apple AirPrint / IPP Everywhere**), instaladores **Click & Play** de un solo clic para clientes **Windows 10 y 11**, compartición nativa **Samba**, apertura estricta de firewall **UFW** y mitigación de hardware a nivel de kernel mediante **reglas Udev** para erradicar el congelamiento por reposo profundo (*deep sleep / USB autosuspend*).
+> El sistema implementa descubrimiento nativo **Zero-Config** para dispositivos móviles (**Android Mopria / Apple AirPrint / IPP Everywhere**), instaladores **Click & Play** de un solo clic para clientes **Windows 10 y 11**, aplicación residente en la bandeja del sistema (**System Tray**) con notificaciones nativas Toast y botón de **recuperación de atascos en 1 clic**, compartición nativa **Samba**, apertura estricta de firewall **UFW** y mitigación de hardware a nivel de kernel mediante **reglas Udev** para erradicar el congelamiento por reposo profundo (*deep sleep / USB autosuspend*).
 
 ---
 
@@ -20,9 +20,9 @@
 
 | Recurso | Enlace Directo | Destinado a | Descripción |
 | :--- | :--- | :--- | :--- |
-| **Portal Web Interactivo (Online)** | [**aronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: topología interactiva, buscador de drivers multimarca y emulador de consola |
+| **Portal Web Interactivo (Online)** | [**aaronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: topología interactiva, buscador de drivers multimarca y manual técnico |
 | **Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
-| **Cliente Windows Click & Play** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador portátil en 1 clic para configurar PCs y portátiles del hogar sin introducir contraseñas |
+| **Cliente Windows Click & Play 🏴‍☠️** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador todo-en-uno `.exe` con icono pirata, app de bandeja System Tray, avisos Toast y control de atascos |
 | **Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |
 | **CLI de Control Remoto** | [`deploy_remote.py`](deploy_remote.py) | PC Administrador | Monitoreo de salud (`--status`), reconfiguración (`--fix-ppd`) y páginas de prueba remotas |
 
@@ -49,11 +49,23 @@
 - Soporte para **Apple AirPrint** (iOS / iPadOS / macOS) sin configuración manual.
 - Guía de contingencia para redes Wi-Fi con aislamiento de punto de acceso (**AP Isolation / Multicast Filtering**).
 
-### 2. Instalador de Cliente Windows "Click & Play"
-- Paquete portátil e independiente en [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/):
-  - **`INSTALAR_IMPRESORA.bat`**: Lanzador con auto-elevación transparente de Administrador (UAC).
-  - **`Instalar_Impresora.ps1`**: Script inteligente en PowerShell que sondea el servidor en la LAN, detecta el mejor controlador instalado (`HP LaserJet M14-M17 PCLmS`, `Microsoft IPP Class Driver` o `Microsoft PCL6 Class Driver`), crea la cola local IPP y envía una página de prueba.
-  - **`DESINSTALAR_IMPRESORA.bat`**: Desinstalación limpia en un clic para equipos temporales o invitados.
+### 2. Clientes Windows 10 y 11: Dos Modos de Uso Disponibles
+Por defecto, Windows entrega los datos a la Raspberry Pi y borra el trabajo de su cola local inmediatamente (*fire-and-forget*), dejando al usuario sin saber si el documento se imprimió o si la impresora se atascó.  
+Para resolver esto, el paquete en [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) ofrece **dos modos de uso para que el usuario elija**:
+
+* **Modo 1 (Recomendado / App con Icono Pirata 🏴‍☠️):**
+  - **`INSTALAR_PRINT_SERVER_PI5.exe`**: Instalador todo-en-uno que solicita la IP del servidor CUPS al usuario (si no existe `ip_servidor.txt`), comprueba la conexión con el puerto 631, registra la impresora y configura la aplicación residente.
+  - **`Print_Server_Pi5.exe` (App de Bandeja / System Tray junto al reloj):**
+    - 🖨️ **Notificaciones Toast nativas:** Avisos emergentes en tiempo real (*"Imprimiendo..."*, *"Completado con éxito"* y alarma sonora ante atascos).
+    - ⚡ **Desbloqueo de atascos en 1 clic:** Cuando la impresora se atasca y CUPS detiene la cola por software, tras retirar el papel basta con hacer clic derecho en el icono pirata > **"Desbloquear y Reanudar Impresora"** para reactivar el servicio sin abrir consolas ni comandos.
+    - 🧹 **Cancelar trabajos:** Opción de purgar documentos dañados.
+    - 🔄 **Inicio automático:** Configurable con casilla de verificación.
+
+* **Modo 2 (Modo Ligero / Scripts por Lotes .bat y .ps1):**
+  - Para quienes no deseen aplicaciones residentes en segundo plano:
+    - **`INSTALAR_IMPRESORA.bat`**: Registra la impresora en Windows Spooler.
+    - **`REANUDAR_IMPRESORA.bat`**: Envía el comando de desbloqueo a la Raspberry Pi tras un atasco.
+    - **`DESINSTALAR_IMPRESORA.bat`**: Retira la impresora del equipo.
 
 ### 3. Mitigación Hardware del Reposo Profundo y Desbloqueo USB (ipp-usb EBUSY Fix)
 - **El Problema 1 (Bloqueo exclusivo USB)**: En distribuciones modernas (Debian 12/13, Ubuntu), el servicio `ipp-usb` intenta reclamar de forma exclusiva el bus USB de la impresora. Al tratarse de un modelo host-based (M14-M17 / M15a), `ipp-usb` bloquea el puerto impidiendo que el controlador HPLIP envíe datos (`Channel write error: Device or resource busy`).
@@ -98,25 +110,24 @@ flowchart TD
         Impresora[("🖨️ HP LaserJet M14-M17\n(ID Hardware: 03f0:be2a)")]
         
         Android["📱 Dispositivos Android\n(Default Print Service / Mopria IPP)"]
-        Win1["💻 PC Sobremesa Windows 11\n(Click & Play / Driver PCLmS)"]
-        Win2["💻 Portátiles Windows 10/11\n(Click & Play / IPP Class Driver)"]
-        Apple["🍏 Dispositivos iOS / macOS\n(AirPrint Zero-Config)"]
+        iOS["🍏 iPhone / iPad / macOS\n(Apple AirPrint Nativo)"]
+        WinTray["💻 Windows 10 / 11\n(Print_Server_Pi5 Tray App & Toasts)"]
         
         Router <--> Servidor
         Router <--> Android
-        Router <--> Win1
-        Router <--> Win2
-        Router <--> Apple
-        Servidor === USB === Impresora
+        Router <--> iOS
+        Router <--> WinTray
+        Servidor -->|Datos PCLmS| USB --> Impresora
     end
 ```
 
 ---
 
-## Despliegue Rápido del Servidor
+## Despliegue del Servidor (Raspberry Pi 5)
 
-### Opción 1: Despliegue Remoto Automatizado (Desde PC Administrador)
-1. Clona el repositorio y copia el archivo de entorno:
+### Opción 1: Despliegue Remoto Automatizado (Recomendada)
+Desde cualquier PC con Python instalado:
+1. Clona el repositorio y crea tu archivo `.env`:
    ```bash
    cp .env.example .env
    ```
@@ -145,25 +156,22 @@ Si accedes directamente por terminal a la Raspberry Pi:
 sudo bash setup_cups_server.sh
 ```
 
-El script se encarga de:
-- Instalar todos los paquetes necesarios del sistema operativo.
-- Configurar `/etc/cups/cupsd.conf` con directivas de compartición y permisos `@LOCAL`.
-- Desplegar la regla udev contra la autosuspensión USB.
-- Inyectar las directivas CUPS en `/etc/samba/smb.conf`.
-- Abrir los puertos correspondientes en el firewall UFW.
-- Habilitar y arrancar los servicios en `systemctl`.
-- Detectar la impresora conectada y crear la cola de impresión compartida.
+El script se encarga de instalar paquetes, configurar `/etc/cups/cupsd.conf` con directivas `@LOCAL`, desplegar la regla udev contra autosuspensión USB, abrir firewall UFW y configurar la cola compartida.
 
 ---
 
-## Configuración en Clientes Windows (Click & Play)
+## Instalación en Clientes Windows 10 y 11
 
-Para cualquier equipo Windows 10 o Windows 11 del hogar:
+### Distribución por Carpetas:
+* [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/): **Paquete Universal para Lectores.** No tiene IP prefijada; solicita la IP local de la Raspberry Pi en la primera ejecución y la guarda en `ip_servidor.txt`.
+* `Cliente_Windows_Privado/`: **Paquete Personal.** Preconfigurado con la IP fija del servidor doméstico para instalación desatendida.
 
+### Pasos de Instalación:
 1. Abre la carpeta [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/).
-2. Haz doble clic sobre **`INSTALAR_IMPRESORA.bat`**.
-3. Acepta el aviso de Administrador de Windows (UAC).
-4. El script configurará automáticamente la cola `HP LaserJet M14-M17 (Red Hogar)` y te permitirá imprimir una página de prueba.
+2. **Método Recomendado (Con App de Bandeja):** Haz doble clic en **`INSTALAR_PRINT_SERVER_PI5.exe`** (icono de bandera pirata 🏴‍☠️).
+   - Escribe la IP de tu Raspberry Pi cuando te lo solicite.
+   - La impresora quedará agregada y el monitor residente se iniciará junto al reloj.
+3. **Método Ligero (Solo Scripts):** Si no deseas software residente, ejecuta **`INSTALAR_IMPRESORA.bat`**.
 
 ---
 
@@ -173,21 +181,11 @@ Para cualquier equipo Windows 10 o Windows 11 del hogar:
 
 ### 1. Android (Detección Automática Zero-Config / Mopria)
 1. Conecta el dispositivo a la red Wi-Fi de la vivienda.
-2. Ve a **Ajustes > Conexiones (o Dispositivos conectados) > Preferencias de conexión > Impresión**.
+2. Ve a **Ajustes > Conexiones > Preferencias de conexión > Impresión**.
 3. Activa el **Servicio de impresión predeterminado** (o **Mopria Print Service**).
-4. Al imprimir cualquier documento o foto desde WhatsApp, Chrome o el visor PDF, selecciona:
-   `HP_LaserJet_M14_M17 @ tu_usuario`.
+4. Al imprimir cualquier documento o foto, selecciona: `HP_LaserJet_M14_M17 @ tu_usuario`.
 
-### 2. Android: Fallback Manual por Dirección IP (Sortear AP Isolation del Router)
-Si tu router Wi-Fi tiene activado el *Aislamiento de Clientes (AP Isolation)* y no muestra impresoras mDNS:
-1. En el menú de impresión de Android, pulsa los **3 puntos (menú)** > **Agregar impresora**.
-2. Selecciona **Agregar por dirección IP**.
-3. Introduce:
-   * **Host:** `192.168.1.XXX`
-   * **URL IPP Directa:** `http://192.168.1.XXX:631/printers/HP_LaserJet_M14_M17`
-
-### 3. iPhone y iPad (Apple AirPrint Nativo)
-Gracias a la difusión DNS-SD de Avahi, iOS detecta la impresora sin apps adicionales:
+### 2. iPhone y iPad (Apple AirPrint Nativo)
 1. Conéctate a la red Wi-Fi del hogar.
 2. Abre cualquier archivo > Pulsa **Compartir** > **Imprimir**.
 3. Selecciona `HP_LaserJet_M14_M17` y pulsa **Imprimir**.
@@ -207,7 +205,7 @@ python deploy_remote.py --deploy
 # Enviar una impresión de prueba directa desde la Pi 5
 python deploy_remote.py --test-page
 
-# Reanudar la cola si se pausó por desconexión física
+# Reanudar la cola si se pausó por desconexión física o atasco
 python deploy_remote.py --unstick
 ```
 
@@ -217,8 +215,7 @@ python deploy_remote.py --unstick
 | **Comprobar estado de colas** | `lpstat -p -d` |
 | **Comprobar si el planificador CUPS corre** | `lpstat -r` |
 | **Ver trabajos pendientes o en error** | `lpstat -o` |
-| **Verificar dispositivo USB conectado** | `lsusb \| grep -i 03f0` |
-| **Detectar URI oficial con HPLIP** | `sudo hp-probe -b usb` |
+| **Verificar dispositivo USB conectado** | `lsusb | grep -i 03f0` |
 | **Reactivar cola atascada manualmente** | `sudo cupsenable HP_LaserJet_M14_M17 && sudo cupsaccept HP_LaserJet_M14_M17` |
 | **Cancelar todos los trabajos en cola** | `cancel -a -x` |
 
@@ -233,21 +230,36 @@ server_print/
 ├── .gitignore                                 # Protección estricta de credenciales y temporales
 ├── LICENSE                                    # Licencia MIT de código abierto
 ├── README.md                                  # Documentación técnica oficial y arquitectura
+├── favicon.png                                # Logotipo original del proyecto
+├── pirata.ico                                 # Icono pirata multirresolución de Windows
 │
 ├── docs/                                      # Manuales y guías detalladas para usuarios
 │   └── GUIA_IMPRESION_MOVIL.md                # Guía paso a paso para móviles Android e iOS / AirPrint
 │
+├── portal_web/                                # Portal web interactivo y manual en línea
+│   ├── index.html                             # Página principal con emulador y topología
+│   ├── css/styles.css                         # Estilos visuales editorial suizo-industrial
+│   └── js/                                    # Lógica interactiva y catálogo de drivers
+│
 ├── setup_cups_server.sh                       # Script Bash modular de despliegue en Raspberry Pi 5
 ├── deploy_remote.py                           # CLI de orquestación y monitoreo remoto (Paramiko)
 │
-├── setup_printer_client.bat                   # Lanzador para clientes Windows (raíz)
-├── setup_printer_client.ps1                   # Script PowerShell de instalación para Windows
+├── Instalador_Print_Server_Pi5.cs             # Código fuente C# del instalador todo-en-uno
+├── Print_Server_Pi5.cs                        # Código fuente C# de la aplicación System Tray
 │
-└── Cliente_Windows_ClickAndPlay/              # Paquete portátil e independiente para la familia
-    ├── INSTALAR_IMPRESORA.bat                 # Doble clic con auto-elevación UAC
-    ├── Instalar_Impresora.ps1                 # Lógica de detección IPP y asignación de drivers
+└── Cliente_Windows_ClickAndPlay/              # Paquete portátil para usuarios y lectores
+    ├── INSTALAR_PRINT_SERVER_PI5.exe          # 🏴‍☠️ Instalador ejecutable único todo-en-uno
+    ├── Print_Server_Pi5.exe                   # 🏴‍☠️ App de bandeja System Tray con Toasts
+    ├── pirata.ico                             # Icono embebido para Windows
+    ├── INSTALAR_IMPRESORA.bat                 # Lanzador de instalación por lotes
     ├── DESINSTALAR_IMPRESORA.bat              # Script de limpieza y desinstalación
-    └── LEEME_INSTRUCCIONES.txt                # Instrucciones sencillas en texto plano
+    ├── REANUDAR_IMPRESORA.bat                 # Desbloqueo rápido tras atascos mecánicos
+    ├── INICIAR_Print_Server_Pi5.bat           # Lanzador del monitor en segundo plano
+    ├── DETENER_Print_Server_Pi5.bat           # Detención del monitor
+    ├── ACTIVAR_INICIO_AUTOMATICO.bat          # Registro en el arranque de Windows
+    ├── DESACTIVAR_INICIO_AUTOMATICO.bat       # Desactivación del arranque automático
+    ├── PROBAR_NOTIFICACIONES.bat              # Test de notificaciones emergentes
+    └── LEEME_INSTRUCCIONES.txt                # Manual de uso y elección entre Modo 1 y Modo 2
 ```
 
 ---
