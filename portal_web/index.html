@@ -483,43 +483,37 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
             </div>
         </div>
 
-        <!-- Conector Interactivo de Cola Web (Client-Side con LocalStorage // Cero Fugas OPSEC) -->
-        <div style="background: var(--bg-surface); border: 2px solid var(--border-strong); padding: 2rem; margin-bottom: 3rem; box-shadow: 4px 4px 0px var(--border-strong);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
-                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700;">
-                    [ CONECTOR DE COLA EN TIEMPO REAL // ZERO-KNOWLEDGE LOCALSTORAGE ]
+        <!-- Banner de Acceso Directo al Gestor Web de CUPS (Zero-Knowledge LocalStorage) -->
+        <div style="background: var(--bg-surface); border: 2px solid var(--border-strong); padding: 2rem; margin-bottom: 2.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; box-shadow: 4px 4px 0px var(--border-strong);">
+            <div style="flex: 1; min-width: 300px;">
+                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.5rem;">
+                    [ MONITOR WEB INTERACTIVO EN VIVO // PUERTO 631 ]
                 </div>
-                <div id="cups-node-status-badge" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); font-weight: 700;">
-                    ○ NODO NO ASIGNADO // ALMACENAMIENTO LOCAL VACÍO
+                <h3 style="font-family: var(--font-display); font-size: 1.45rem; margin-bottom: 0.5rem; color: var(--ink-primary);">
+                    Panel de Administración & Cola de Impresión CUPS
+                </h3>
+                <p style="color: var(--ink-secondary); font-size: 0.95rem; max-width: 650px; margin: 0; line-height: 1.5;">
+                    Accede desde cualquier dispositivo de la red local (PC, tablet o móvil) para inspeccionar trabajos en curso, ver el historial de documentos impresos o cancelar tareas atascadas.
+                </p>
+                <div id="cups-node-status" style="margin-top: 0.75rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-muted);">
+                    <!-- Generado dinámicamente: estado del nodo y almacenamiento en cliente -->
                 </div>
             </div>
-
-            <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--ink-primary);">
-                Panel Web de Administración & Cola CUPS
-            </h3>
-            <p style="color: var(--ink-secondary); font-size: 0.95rem; max-width: 850px; margin-bottom: 1.5rem; line-height: 1.5;">
-                Para mantener la máxima privacidad sin exponer direcciones IP privadas en el código público, este portal almacena la dirección de tu Raspberry Pi <strong>exclusivamente en el LocalStorage de tu navegador</strong>. Introduce la IP o nombre de host mDNS de tu servidor local para abrir de inmediato el gestor de trabajos.
-            </p>
-
-            <!-- Barra de Configuración de IP -->
-            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; background: var(--bg-secondary); padding: 1rem; border: 1px solid var(--border-subtle);">
-                <label for="cups-node-ip-input" style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--ink-primary);">IP / HOST DEL SERVIDOR:</label>
-                <input type="text" id="cups-node-ip-input" placeholder="ej: 192.168.1.100 o printserver.local" style="flex: 1; min-width: 240px; padding: 0.65rem 0.85rem; font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg-surface); color: var(--ink-primary); border: 1px solid var(--border-strong); outline: none;">
-                <button type="button" id="save-node-ip-btn" class="btn-industrial" style="padding: 0.65rem 1.25rem; font-size: 0.8rem; font-weight: 700;">GUARDAR EN NAVEGADOR</button>
-                <button type="button" id="clear-node-ip-btn" class="btn-industrial btn-outline" style="padding: 0.65rem 1rem; font-size: 0.8rem; display: none;">BORRAR</button>
-            </div>
-
-            <!-- Botones de Acción hacia la Cola -->
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <a href="#" id="btn-open-jobs" class="btn-industrial btn-primary-vermilion">
-                    <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <span>VER TRABAJOS EN COLA</span>
-                    <span style="font-family: var(--font-mono);">&rarr;</span>
-                </a>
-                <a href="#" id="btn-open-printer" class="btn-industrial btn-outline">
-                    <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                    <span>ESTADO DE IMPRESORA</span>
-                </a>
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; align-items: flex-start;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#" id="btn-open-jobs" class="btn-industrial btn-primary-vermilion">
+                        <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>VER TRABAJOS EN COLA</span>
+                        <span style="font-family: var(--font-mono);">&rarr;</span>
+                    </a>
+                    <a href="#" id="btn-open-printer" class="btn-industrial btn-outline">
+                        <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>ESTADO IMPRESORA</span>
+                    </a>
+                </div>
+                <div id="cups-node-config-action" style="font-family: var(--font-mono); font-size: 0.75rem;">
+                    <!-- [ Cambiar IP del servidor ] -->
+                </div>
             </div>
         </div>
 

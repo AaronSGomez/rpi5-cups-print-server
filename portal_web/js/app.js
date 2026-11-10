@@ -374,110 +374,116 @@ function initDynamicCopyButtons() {
 
 
 /* -----------------------------------------------------------------------------
-   7. GESTOR DE NODO LOCAL & ACCESO A COLAS (LOCALSTORAGE SOVEREIGN PRIVACY)
+   7. GESTOR DE ACCESO DIRECTO CUPS (ZERO-KNOWLEDGE LOCALSTORAGE)
    ----------------------------------------------------------------------------- */
 function initCupsNodeConnector() {
-    const ipInput = document.getElementById("cups-node-ip-input");
-    const saveBtn = document.getElementById("save-node-ip-btn");
-    const clearBtn = document.getElementById("clear-node-ip-btn");
     const btnJobs = document.getElementById("btn-open-jobs");
     const btnPrinter = document.getElementById("btn-open-printer");
-    const statusBadge = document.getElementById("cups-node-status-badge");
+    const statusEl = document.getElementById("cups-node-status");
+    const configActionEl = document.getElementById("cups-node-config-action");
 
-    if (!ipInput) return;
+    if (!btnJobs && !btnPrinter) return;
 
-    // Cargar IP guardada previamente en el navegador del usuario (sin fuga pública)
-    const savedIp = localStorage.getItem("printcore_node_ip") || "";
-    if (savedIp) {
-        ipInput.value = savedIp;
-        updateBadge(savedIp);
+    function getNodeIp() {
+        return localStorage.getItem("printcore_node_ip") || "";
     }
 
-    function updateBadge(ip) {
-        if (!statusBadge) return;
-        if (ip) {
-            statusBadge.textContent = `● NODO CONFIGURADO: http://${ip}:631`;
-            statusBadge.style.color = "#10B981";
-            if (clearBtn) clearBtn.style.display = "inline-flex";
-        } else {
-            statusBadge.textContent = "○ NODO NO ASIGNADO // ALMACENAMIENTO LOCAL VACÍO";
-            statusBadge.style.color = "var(--ink-muted)";
-            if (clearBtn) clearBtn.style.display = "none";
-        }
+    function cleanHost(val) {
+        if (!val) return "";
+        return val.trim()
+            .replace(/^https?:\/\//i, "")
+            .replace(/\/.*$/, "")
+            .replace(/:631.*$/, "");
     }
 
-    function saveIp() {
-        let val = ipInput.value.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/:631.*$/, "");
-        if (val) {
-            localStorage.setItem("printcore_node_ip", val);
-            ipInput.value = val;
-            updateBadge(val);
-            if (saveBtn) {
-                const orig = saveBtn.textContent;
-                saveBtn.textContent = "[ GUARDADO ✓ ]";
-                saveBtn.style.background = "#10B981";
-                saveBtn.style.color = "#FFFFFF";
-                setTimeout(() => {
-                    saveBtn.textContent = orig;
-                    saveBtn.style.background = "";
-                    saveBtn.style.color = "";
-                }, 1800);
-            }
-            return val;
+    function setNodeIp(ip) {
+        const clean = cleanHost(ip);
+        if (clean) {
+            localStorage.setItem("printcore_node_ip", clean);
+            renderState(clean);
+            return clean;
         } else {
             localStorage.removeItem("printcore_node_ip");
-            updateBadge("");
+            renderState("");
             return "";
         }
     }
 
-    if (saveBtn) {
-        saveBtn.addEventListener("click", saveIp);
-    }
-
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            localStorage.removeItem("printcore_node_ip");
-            ipInput.value = "";
-            updateBadge("");
-            ipInput.focus();
-        });
-    }
-
-    ipInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            saveIp();
+    function requestIpFromUser(reason) {
+        const current = getNodeIp();
+        const promptMsg = reason === "edit"
+            ? "Introduce la nueva IP local o hostname de tu Raspberry Pi (deja vacío para eliminar acceso directo):"
+            : "Antes de crear el acceso directo a la cola CUPS, introduce la IP local o hostname de tu servidor de impresión (ej: 192.168.1.100 o printserver.local):";
+        
+        const entered = prompt(promptMsg, current);
+        if (entered !== null) {
+            return setNodeIp(entered);
         }
-    });
+        return current;
+    }
 
-    function navigateTo(path) {
-        let ip = ipInput.value.trim() || localStorage.getItem("printcore_node_ip");
-        if (!ip) {
-            ip = prompt("Introduce la IP local o hostname de tu Raspberry Pi (ej: 192.168.1.100 o printserver.local):");
-            if (ip) {
-                ip = ip.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/:631.*$/, "");
-                ipInput.value = ip;
-                saveIp();
-            } else {
-                return;
+    function renderState(ip) {
+        if (ip) {
+            if (btnJobs) {
+                btnJobs.href = `http://${ip}:631/jobs/`;
+                btnJobs.target = "_blank";
+                btnJobs.rel = "noopener noreferrer";
+            }
+            if (btnPrinter) {
+                btnPrinter.href = `http://${ip}:631/printers/HP_LaserJet_M14_M17`;
+                btnPrinter.target = "_blank";
+                btnPrinter.rel = "noopener noreferrer";
+            }
+            if (statusEl) {
+                statusEl.innerHTML = `<span style="color: #10B981; font-weight: 700;">● NODO CONECTADO:</span> <code style="color: var(--ink-primary); background: var(--bg-secondary); padding: 0.15rem 0.4rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-family: var(--font-mono);">http://${ip}:631</code> <span style="color: var(--ink-muted); font-size: 0.72rem;">(almacenado en tu navegador)</span>`;
+            }
+            if (configActionEl) {
+                configActionEl.innerHTML = `<a href="#" id="cups-change-ip-btn" style="color: var(--accent-vermilion); text-decoration: underline; font-weight: 700; cursor: pointer;">[ Cambiar o restablecer IP de nodo ]</a>`;
+                const changeBtn = document.getElementById("cups-change-ip-btn");
+                if (changeBtn) {
+                    changeBtn.onclick = (e) => {
+                        e.preventDefault();
+                        requestIpFromUser("edit");
+                    };
+                }
             }
         } else {
-            saveIp();
+            if (btnJobs) {
+                btnJobs.href = "#";
+                btnJobs.removeAttribute("target");
+            }
+            if (btnPrinter) {
+                btnPrinter.href = "#";
+                btnPrinter.removeAttribute("target");
+            }
+            if (statusEl) {
+                statusEl.innerHTML = `<span style="color: var(--ink-muted);">○ ACCESO DIRECTO NO CONFIGURADO // Pulsa el botón para indicar la IP de tu servidor</span>`;
+            }
+            if (configActionEl) {
+                configActionEl.innerHTML = `<span style="color: var(--ink-muted); font-size: 0.72rem;">🔒 Cero fugas de red: la IP se almacena exclusivamente en tu dispositivo (LocalStorage)</span>`;
+            }
         }
-        window.open(`http://${ip}:631${path}`, "_blank", "noopener,noreferrer");
+    }
+
+    function handleButtonClick(e, path) {
+        let ip = getNodeIp();
+        if (!ip) {
+            e.preventDefault();
+            ip = requestIpFromUser("create");
+            if (ip) {
+                window.open(`http://${ip}:631${path}`, "_blank", "noopener,noreferrer");
+            }
+        }
     }
 
     if (btnJobs) {
-        btnJobs.addEventListener("click", (e) => {
-            e.preventDefault();
-            navigateTo("/jobs/");
-        });
+        btnJobs.addEventListener("click", (e) => handleButtonClick(e, "/jobs/"));
     }
 
     if (btnPrinter) {
-        btnPrinter.addEventListener("click", (e) => {
-            e.preventDefault();
-            navigateTo("/printers/HP_LaserJet_M14_M17");
-        });
+        btnPrinter.addEventListener("click", (e) => handleButtonClick(e, "/printers/HP_LaserJet_M14_M17"));
     }
+
+    // Inicializar con la IP guardada en cliente
+    renderState(getNodeIp());
 }
