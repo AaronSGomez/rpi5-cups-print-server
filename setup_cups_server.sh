@@ -138,6 +138,10 @@ ServerAlias *
 DefaultAuthType Basic
 DefaultEncryption Never
 
+# Tamaño de papel estándar europeo e Interfaz Web de administración
+DefaultPaperSize A4
+WebInterface Yes
+
 <Location />
   Order allow,deny
   Allow @LOCAL
@@ -421,6 +425,10 @@ if [ -n "$DETECTED_URI" ]; then
     # Configuración crítica: evitar que la cola se detenga por sleep
     /usr/sbin/lpadmin -p "$PRINTER_QUEUE_NAME" -o printer-error-policy=retry-job
     /usr/sbin/lpadmin -p "$PRINTER_QUEUE_NAME" -o printer-is-shared=true
+    /usr/sbin/lpadmin -p "$PRINTER_QUEUE_NAME" -o PageSize=A4
+    /usr/sbin/lpadmin -p "$PRINTER_QUEUE_NAME" -o media=A4
+    /usr/sbin/lpadmin -p "$PRINTER_QUEUE_NAME" -o fit-to-page-default=true
+    /usr/sbin/lpadmin -p "$PRINTER_QUEUE_NAME" -o print-scaling-default=fill
     /usr/sbin/lpadmin -d "$PRINTER_QUEUE_NAME"
 
     cupsenable "$PRINTER_QUEUE_NAME"

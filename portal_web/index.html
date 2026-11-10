@@ -32,6 +32,7 @@
                 <li><a href="#drivers">03. DRIVERS & MODELOS</a></li>
                 <li><a href="#clientes">04. CLIENTES & MÓVIL</a></li>
                 <li><a href="#terminal">05. TERMINAL LAB</a></li>
+                <li><a href="#troubleshooting">06. COLAS & FAQ</a></li>
             </ul>
 
             <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Cambiar tema visual">[ DARK THEME ]</button>
@@ -469,6 +470,108 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
     </section>
 
     <!-- -----------------------------------------------------------------------
+         SECCIÓN 06: GESTIÓN DE COLAS & RESOLUCIÓN DE PROBLEMAS
+         ----------------------------------------------------------------------- -->
+    <section id="troubleshooting" class="section-wrapper">
+        <div class="section-editorial-header">
+            <div class="section-numeral">06 // QUEUE & TROUBLESHOOTING</div>
+            <div class="section-heading-text">
+                <h2>Gestión de Colas Web & Base de Conocimiento</h2>
+                <p>
+                    Monitorización en vivo de trabajos, control de escala en formato A4 sin márgenes dobles y resolución paso a paso de incidencias frecuentes en Android, iOS y Windows.
+                </p>
+            </div>
+        </div>
+
+        <!-- Banner de Acceso Directo al Gestor Web de CUPS -->
+        <div style="background: var(--bg-surface); border: 2px solid var(--border-strong); padding: 2rem; margin-bottom: 2.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; box-shadow: 4px 4px 0px var(--border-strong);">
+            <div>
+                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.5rem;">
+                    [ MONITOR WEB INTERACTIVO EN VIVO // PUERTO 631 ]
+                </div>
+                <h3 style="font-family: var(--font-display); font-size: 1.45rem; margin-bottom: 0.5rem; color: var(--ink-primary);">
+                    Panel de Administración & Cola de Impresión CUPS
+                </h3>
+                <p style="color: var(--ink-secondary); font-size: 0.95rem; max-width: 650px; margin: 0; line-height: 1.5;">
+                    Accede desde cualquier dispositivo de la red local (PC, tablet o móvil) para inspeccionar trabajos en curso, ver el historial de documentos impresos o cancelar tareas atascadas.
+                </p>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="http://192.168.1.40:631/jobs/" target="_blank" rel="noopener" class="btn-industrial btn-primary-vermilion">
+                    <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>VER TRABAJOS EN COLA</span>
+                    <span style="font-family: var(--font-mono);">&rarr;</span>
+                </a>
+                <a href="http://192.168.1.40:631/printers/HP_LaserJet_M14_M17" target="_blank" rel="noopener" class="btn-industrial btn-outline">
+                    <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <span>ESTADO IMPRESORA</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Matriz de Problemas Frecuentes y Soluciones -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 1.5rem;">
+            
+            <!-- Tarjeta 1: Márgenes y A4 -->
+            <div class="client-instruction-box">
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ FORMATO DE PÁGINA ]</div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Ajuste a A4 y Eliminación de Marcos Blancos</h3>
+                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                    Si el documento se imprime con marcos indeseados o contenido encogido, se debe al desfase entre el tamaño <em>Letter (Carta americana)</em> y <em>A4 (Europeo)</em>.
+                </p>
+                <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                    <li><strong>En el Servidor:</strong> Configurado con <code>PageSize=A4</code>, <code>media=A4</code> y <code>fit-to-page=true</code>.</li>
+                    <li><strong>En el Móvil / Tablet:</strong> En la ventana de previsualización de impresión, despliega <em>Más opciones</em>, selecciona tamaño <strong>A4</strong> y marca la opción <strong>"Ajustar al área de impresión"</strong> o <strong>"Rellenar página"</strong>.</li>
+                </ul>
+            </div>
+
+            <!-- Tarjeta 2: Cifrado y Desencriptado -->
+            <div class="client-instruction-box">
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ SEGURIDAD & TLS ]</div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Aviso: "Esta impresora no acepta trabajos encriptados"</h3>
+                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                    Android recuerda si una impresora intentó usar TLS anteriormente. Al pasar al modo IPP en claro (para evitar certificados autofirmados rotos), el sistema pide confirmación preventiva.
+                </p>
+                <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                    <li>Pulsa <strong>"Continuar"</strong> o <strong>"Aceptar"</strong> en la pantalla del móvil para autorizar la impresión.</li>
+                    <li>Para no volver a ver el aviso: en <em>Ajustes &gt; Impresión</em>, pulsa en la impresora, elige <strong>Olvidar</strong> y vuelve a buscarla de cero.</li>
+                </ul>
+            </div>
+
+            <!-- Tarjeta 3: Luz Naranja y Bloqueo -->
+            <div class="client-instruction-box">
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ HARDWARE & SENSORES ]</div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Luz Naranja Parpadeante / Impresora Bloqueada</h3>
+                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                    La HP LaserJet M14-M17 entra en pausa si detecta tóner en mínimos (código 1601), falta de papel en la bandeja o tras solventar un atasco.
+                </p>
+                <ul class="instruction-steps-list" style="font-size: 0.9rem;">
+                    <li><strong>Botón Reanudar:</strong> Presiona el botón frontal con el icono de la <strong>hoja de papel / flecha</strong> para autorizar la tirada con tóner bajo.</li>
+                    <li><strong>Atasco de papel:</strong> Abre la compuerta superior, extrae el cartucho de tóner, retira la hoja atascada suavemente y vuelve a cerrar.</li>
+                </ul>
+            </div>
+
+            <!-- Tarjeta 4: Control desde Consola PC -->
+            <div class="client-instruction-box">
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.35rem;">[ AUTOMATIZACIÓN PC ]</div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Comandos de Gestión Remota desde PC (deploy_remote.py)</h3>
+                <p style="color: var(--ink-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1rem;">
+                    Interactúa directamente con la cola CUPS desde la terminal de Windows sin necesidad de abrir la interfaz web:
+                </p>
+                <div style="background: var(--bg-code); color: #F4F3EF; padding: 0.85rem; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6; border-radius: var(--radius-sm);">
+                    <div style="color: #9CA3AF;"># Ver trabajos activos y completados:</div>
+                    <div style="color: #34D399;">python deploy_remote.py --jobs</div>
+                    <div style="color: #9CA3AF; margin-top: 0.4rem;"># Purgar y limpiar cola atascada:</div>
+                    <div style="color: #34D399;">python deploy_remote.py --clear-jobs</div>
+                    <div style="color: #9CA3AF; margin-top: 0.4rem;"># Desbloquear cola suspendida:</div>
+                    <div style="color: #34D399;">python deploy_remote.py --unstick</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
          FOOTER / COLOFÓN EDITORIAL
          ----------------------------------------------------------------------- -->
     <footer class="colophon-footer">
@@ -493,6 +596,7 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
                     <li><a href="#replicacion">Guía de Replicación</a></li>
                     <li><a href="#drivers">Buscador de Drivers</a></li>
                     <li><a href="#clientes">Clientes Windows & Móvil</a></li>
+                    <li><a href="#troubleshooting">Colas & Troubleshooting</a></li>
                 </ul>
             </div>
 

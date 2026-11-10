@@ -25,6 +25,7 @@ RPI_PORT = int(os.getenv("RPI_PORT", "22"))
 RPI_USER = os.getenv("RPI_USER", "tu_usuario")
 RPI_PASSWORD = os.getenv("RPI_PASSWORD", "")
 PRINTER_QUEUE_NAME = os.getenv("PRINTER_QUEUE_NAME", "HP_LaserJet_M14_M17")
+CUPS_PORT = int(os.getenv("CUPS_PORT", "631"))
 
 
 def get_ssh_session():
@@ -128,6 +129,10 @@ def check_status():
         print("\n--- 4. PUERTOS EN ESCUCHA (IPP 631 / SMB 445 / mDNS 5353) ---")
         execute_stream_command(client, "sudo ss -tlunp | grep -E '631|445|5353' || true", sudo=True)
 
+        print("\n--- 5. PANELES WEB DE GESTIÓN (CUPS) ---")
+        print(f"   🌐 Monitor de Trabajos en Cola: http://{RPI_HOST}:{CUPS_PORT}/jobs/")
+        print(f"   🖨️ Estado de la Impresora:     http://{RPI_HOST}:{CUPS_PORT}/printers/{PRINTER_QUEUE_NAME}")
+
     finally:
         client.close()
 
@@ -147,6 +152,40 @@ def print_test_page():
         execute_stream_command(client, test_cmd)
         print("\n[*] Estado de trabajos activos:")
         execute_stream_command(client, f"lpstat -o {PRINTER_QUEUE_NAME}")
+    finally:
+        client.close()
+
+
+def list_jobs():
+    """Muestra trabajos activos y completados en la cola CUPS."""
+    print("\n" + "=" * 70)
+    print(f"📋 COLA DE TRABAJOS DE IMPRESIÓN — {PRINTER_QUEUE_NAME}")
+    print(f"🌐 Monitor Web en Vivo: http://{RPI_HOST}:{CUPS_PORT}/jobs/")
+    print("=" * 70)
+
+    client, _ = get_ssh_session()
+    try:
+        print("\n--- 1. TRABAJOS ACTIVOS (EN PROCESO / PENDIENTES) ---")
+        execute_stream_command(client, "lpstat -o || echo 'No hay trabajos pendientes.'")
+
+        print("\n--- 2. ÚLTIMOS TRABAJOS COMPLETADOS ---")
+        execute_stream_command(client, "lpstat -W completed | tail -n 10 || true")
+    finally:
+        client.close()
+
+
+def clear_jobs():
+    """Cancela todos los trabajos pendientes y purga la cola."""
+    print("\n" + "=" * 70)
+    print(f"🧹 CANCELANDO TODOS LOS TRABAJOS Y PURGANDO LA COLA: {PRINTER_QUEUE_NAME}")
+    print("=" * 70)
+
+    client, _ = get_ssh_session()
+    try:
+        cmd = f"sudo cancel -a -x && sudo cupsenable {PRINTER_QUEUE_NAME} && sudo cupsaccept {PRINTER_QUEUE_NAME}"
+        execute_stream_command(client, cmd, sudo=True)
+        print("\n[*] Estado de la cola tras el vaciado:")
+        execute_stream_command(client, f"lpstat -p {PRINTER_QUEUE_NAME} -o")
     finally:
         client.close()
 
@@ -239,6 +278,8 @@ def main():
     parser.add_argument("--deploy", action="store_true", help="Despliega e instala CUPS, HPLIP, Avahi y Samba")
     parser.add_argument("--status", action="store_true", help="Comprueba la salud del servidor y estado de colas")
     parser.add_argument("--test-page", action="store_true", help="Imprime una página de prueba desde la Raspberry Pi")
+    parser.add_argument("--jobs", action="store_true", help="Lista los trabajos activos y completados en la cola")
+    parser.add_argument("--clear-jobs", action="store_true", help="Cancela todos los trabajos pendientes y purga la cola")
     parser.add_argument("--unstick", action="store_true", help="Reanuda la cola tras un bloqueo por suspensión/sleep")
     parser.add_argument("--diag", action="store_true", help="Diagnóstico profundo de PPDs, errores y cola")
     parser.add_argument("--fix-ppd", action="store_true", help="Reconfigura la cola con el PPD exacto vía hp-setup")
@@ -255,6 +296,10 @@ def main():
         check_status()
     elif args.test_page:
         print_test_page()
+    elif args.jobs:
+        list_jobs()
+    elif args.clear_jobs:
+        clear_jobs()
     elif args.unstick:
         unstick_queue()
     elif args.diag:
