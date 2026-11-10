@@ -366,6 +366,42 @@
                     </ol>
                 </div>
             </div>
+
+            <!-- Nuevo Módulo: Monitor Print_Server_Pi5 & Notificaciones de Atasco -->
+            <div style="background: var(--bg-surface); border: 2px solid var(--border-strong); padding: 1.75rem; margin-top: 1.5rem; box-shadow: 4px 4px 0px var(--border-strong);">
+                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-vermilion); font-weight: 700; margin-bottom: 0.4rem;">
+                    [ MONITOR RESIDENTE // PRINT_SERVER_PI5 // NOTIFICACIONES TOAST NATIVAS ]
+                </div>
+                <h3 style="font-family: var(--font-display); font-size: 1.35rem; color: var(--ink-primary); margin-bottom: 0.6rem;">
+                    Sincronización de Errores, Éxitos y Atascos en Windows
+                </h3>
+                <p style="color: var(--ink-secondary); font-size: 0.93rem; line-height: 1.55; margin-bottom: 1.25rem;">
+                    Por arquitectura histórica, el Spooler de Windows opera en modo <em>"enviar y olvidar"</em>: entrega los datos a la Raspberry Pi, vacía la cola local y no informa si la hoja física salió o si ocurrió un atasco mecánico. El servicio <strong><code>Print_Server_Pi5</code></strong> monitoriza en vivo el servidor CUPS y traslada el ciclo completo de impresión al Centro de Notificaciones de Windows 10/11:
+                </p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-left: 3px solid var(--accent-blue);">
+                        <strong style="color: var(--ink-primary); font-family: var(--font-mono); font-size: 0.85rem;">🖨️ En Proceso:</strong>
+                        <div style="color: var(--ink-secondary); font-size: 0.88rem; margin-top: 0.3rem;">Notificación Toast instantánea en cuanto el trabajo entra en la cola CUPS del servidor con su ID y número de páginas.</div>
+                    </div>
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-left: 3px solid #10B981;">
+                        <strong style="color: var(--ink-primary); font-family: var(--font-mono); font-size: 0.85rem;">✅ Éxito Físico:</strong>
+                        <div style="color: var(--ink-secondary); font-size: 0.88rem; margin-top: 0.3rem;">Aviso de confirmación en pantalla cuando la hoja ha terminado de salir físicamente de los rodillos de la impresora.</div>
+                    </div>
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-left: 3px solid var(--accent-vermilion);">
+                        <strong style="color: var(--ink-primary); font-family: var(--font-mono); font-size: 0.85rem;">⚠️ Alerta de Atasco:</strong>
+                        <div style="color: var(--ink-secondary); font-size: 0.88rem; margin-top: 0.3rem;">Alarma sonora y notificación crítica roja si la impresora se bloquea, se queda sin papel o la cola se detiene.</div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-code); color: #F4F3EF; padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.6; border-radius: var(--radius-sm);">
+                    <div style="color: #9CA3AF;"># Archivos integrados en Cliente_Windows_ClickAndPlay y Cliente_Windows_Privado:</div>
+                    <div><span style="color: #60A5FA;">INICIAR_Print_Server_Pi5.bat</span>     <span style="color: #9CA3AF;">-&gt; Inicia el monitor silencioso en segundo plano.</span></div>
+                    <div><span style="color: #60A5FA;">ACTIVAR_INICIO_AUTOMATICO.bat</span>  <span style="color: #9CA3AF;">-&gt; Lo arranca automáticamente al encender el portátil.</span></div>
+                    <div><span style="color: #34D399;">REANUDAR_IMPRESORA.bat</span>         <span style="color: #9CA3AF;">-&gt; ¡1 Clic para desbloquear la cola CUPS tras sacar el papel atascado!</span></div>
+                    <div><span style="color: #F87171;">DETENER_Print_Server_Pi5.bat</span>     <span style="color: #9CA3AF;">-&gt; Detiene el proceso del monitor en cualquier momento.</span></div>
+                </div>
+            </div>
         </div>
 
         <!-- Panel Android -->
@@ -568,6 +604,7 @@ planificador de tareas (cupsd): EJECUTÁNDOSE [OK]</div>
                     <ul class="instruction-steps-list" style="font-size: 0.9rem;">
                         <li><strong>Botón Reanudar:</strong> Presiona el botón frontal con el icono de la <strong>hoja de papel / flecha</strong> para autorizar la tirada con tóner bajo.</li>
                         <li><strong>Atasco de papel:</strong> Abre la compuerta superior, extrae el cartucho de tóner, retira la hoja atascada suavemente y vuelve a cerrar.</li>
+                        <li><strong>Desbloqueo de cola CUPS:</strong> Tras retirar el papel atascado, CUPS mantiene la cola en estado <em>Stopped</em>. Haz doble clic en <code>REANUDAR_IMPRESORA.bat</code> en Windows o pulsa <em>"Reanudar impresora"</em> en la web de CUPS para que vuelva a imprimir.</li>
                     </ul>
                 </div>
 

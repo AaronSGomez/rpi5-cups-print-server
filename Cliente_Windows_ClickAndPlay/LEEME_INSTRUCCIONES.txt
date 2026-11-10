@@ -1,24 +1,37 @@
 =============================================================================
-INSTALADOR DE IMPRESORA PARA EQUIPOS DE LA CASA (WINDOWS 10 Y 11)
+CLIENTE WINDOWS 10 / 11 CLICK & PLAY - SERVIDOR DE IMPRESIÓN RASPBERRY PI
 =============================================================================
 
-Para que cualquier ordenador de la casa (portátil o de sobremesa) pueda imprimir
-en la HP LaserJet M14-M17 conectada a la Raspberry Pi 5:
-
-1. Asegúrate de que el ordenador esté conectado a la misma red Wi-Fi o cable del hogar.
-2. Copia esta carpeta ("Cliente_Windows_ClickAndPlay") en el ordenador que quieras configurar 
-   (o ejecútala directamente desde un pendrive USB o carpeta compartida).
-3. Haz doble clic en el archivo:
-   👉 INSTALAR_IMPRESORA.bat
-4. Si Windows solicita permisos de administrador, pulsa "Sí".
-5. El instalador detectará automáticamente el servidor en la red, configurará el controlador
-   y te permitirá enviar una página de prueba.
-
-¡Listo! A partir de ese momento podrás imprimir desde Word, navegador, PDF o cualquier
-programa eligiendo "HP LaserJet M14-M17 (Red Hogar)".
+1. INSTALACIÓN DE LA IMPRESORA (1 CLIC):
+   - Haz doble clic en "INSTALAR_IMPRESORA.bat".
+   - Si es la primera vez, introduce la IP local de tu Raspberry Pi cuando te lo pida.
+   - Configurará automáticamente el puerto IPP y el mejor controlador compatible.
 
 -----------------------------------------------------------------------------
-Desinstalación:
-Si en algún momento deseas quitarla de un equipo invitado o temporal,
-haz doble clic en "DESINSTALAR_IMPRESORA.bat".
+2. MONITOR EN TIEMPO REAL (PRINT_SERVER_PI5):
+   Soluciona el problema de no saber si un trabajo falló, se imprimió o se atascó.
+   Windows por defecto borra el trabajo de la cola en cuanto lo envía y no avisa.
+   Este servicio monitoriza el servidor CUPS y te avisa con notificaciones Toast:
+     • "🖨️ Imprimiendo documento" al enviar la orden.
+     • "✅ Impresión Completada con Éxito" cuando la hoja sale físicamente.
+     • "⚠️ ATASCO O ERROR DE IMPRESIÓN" con sonido de alarma si la cola se detiene.
+
+   ARCHIVOS DEL MONITOR:
+   - INICIAR_Print_Server_Pi5.bat:
+     Inicia el monitor en segundo plano (sin dejar consolas abiertas).
+   - ACTIVAR_INICIO_AUTOMATICO.bat:
+     Hace que se inicie solo cada vez que arranques tu portátil o PC.
+   - DESACTIVAR_INICIO_AUTOMATICO.bat:
+     Elimina el inicio automático si no lo deseas.
+   - DETENER_Print_Server_Pi5.bat:
+     Detiene el monitor en segundo plano.
+   - PROBAR_NOTIFICACIONES.bat:
+     Lanza 3 notificaciones de prueba inmediatas en pantalla.
+
+-----------------------------------------------------------------------------
+3. DESBLOQUEO TRAS ATASCOS DE PAPEL:
+   - REANUDAR_IMPRESORA.bat:
+     Cuando la impresora sufra un atasco, retira el papel atascado y haz doble clic
+     en este archivo. Desbloqueará la cola CUPS en la Raspberry Pi de inmediato
+     sin tener que entrar por SSH ni a la web de CUPS.
 =============================================================================
