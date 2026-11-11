@@ -163,9 +163,8 @@ El script se encarga de instalar paquetes, configurar `/etc/cups/cupsd.conf` con
 
 ## Instalación en Clientes Windows 10 y 11
 
-### Distribución por Carpetas:
-* [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/): **Paquete Universal para Lectores.** No tiene IP prefijada; solicita la IP local de la Raspberry Pi en la primera ejecución y la guarda en `ip_servidor.txt`.
-* `Cliente_Windows_Privado/`: **Paquete Personal.** Preconfigurado con la IP fija del servidor doméstico (`192.168.1.40`) para instalación 100% desatendida.
+### Paquete de Distribución Windows:
+* [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/): **Paquete Universal Click & Play.** Solicita la IP local de la Raspberry Pi en la primera ejecución (o lee `ip_servidor.txt` si existe junto al instalador) y despliega el servicio completo en el equipo.
 
 > 💡 **Ejecución Autónoma (Descarga Directa Web o Pendrive USB):**  
 > **No necesitas descargar el repositorio ni copiar archivos adicionales.** Al incrustar `Print_Server_Pi5.exe` y `pirata.ico` dentro del propio ejecutable, puedes descargar solo `INSTALAR_PRINT_SERVER_PI5.exe` desde el portal web y abrirlo desde *Descargas*, un Pendrive USB o una carpeta de red. El instalador detendrá instancias previas, copiará permanentemente los archivos a `C:\Program Files\Print_Server_Pi5\`, registrará el arranque en `HKLM\...\Run` (64 bits) e iniciará el servicio de bandeja en la sesión gráfica del usuario.
