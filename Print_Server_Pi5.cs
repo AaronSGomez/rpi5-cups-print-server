@@ -17,13 +17,26 @@ namespace PrintServerPi5
         [STAThread]
         static void Main(string[] args)
         {
+            bool isStartup = false;
+            foreach (string a in args)
+            {
+                if (a.Equals("--startup", StringComparison.OrdinalIgnoreCase) ||
+                    a.Equals("/startup", StringComparison.OrdinalIgnoreCase))
+                {
+                    isStartup = true;
+                }
+            }
+
             bool createdNew;
-            using (Mutex mutex = new Mutex(true, "Global\\Print_Server_Pi5_Tray_App", out createdNew))
+            using (Mutex mutex = new Mutex(true, "Local\\Print_Server_Pi5_Tray_App", out createdNew))
             {
                 if (!createdNew)
                 {
-                    MessageBox.Show("Print_Server_Pi5 ya está en ejecución en la bandeja del sistema (junto al reloj).",
-                        "Print_Server_Pi5", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (!isStartup)
+                    {
+                        MessageBox.Show("Print_Server_Pi5 ya está en ejecución en la bandeja del sistema (junto al reloj).",
+                            "Print_Server_Pi5", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     return;
                 }
 
@@ -46,6 +59,7 @@ namespace PrintServerPi5
         private int serverPort = 631;
         private string queueName = "HP_LaserJet_M14_M17";
         private string configPath;
+        private string userConfigPath;
 
         private int lastKnownJobId = 0;
         private Dictionary<int, string> trackedJobs = new Dictionary<int, string>();
@@ -55,12 +69,18 @@ namespace PrintServerPi5
         {
             string appDir = AppDomain.CurrentDomain.BaseDirectory;
             configPath = Path.Combine(appDir, "ip_servidor.txt");
+            userConfigPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Print_Server_Pi5",
+                "ip_servidor.txt"
+            );
 
             LoadServerIp();
 
             bool forcePrompt = false;
             foreach (string a in args) { if (a == "--prompt-ip" || a == "-p") forcePrompt = true; }
-            if (forcePrompt || !File.Exists(configPath))
+            bool hasConfig = File.Exists(userConfigPath) || File.Exists(configPath);
+            if (forcePrompt || !hasConfig)
             {
                 PromptForServerIp();
             }
@@ -73,9 +93,10 @@ namespace PrintServerPi5
         {
             try
             {
-                if (File.Exists(configPath))
+                string activePath = File.Exists(userConfigPath) ? userConfigPath : configPath;
+                if (File.Exists(activePath))
                 {
-                    string ip = File.ReadAllText(configPath).Trim();
+                    string ip = File.ReadAllText(activePath).Trim();
                     if (!string.IsNullOrEmpty(ip) && !ip.StartsWith("#"))
                     {
                         serverHost = ip;
@@ -87,10 +108,19 @@ namespace PrintServerPi5
 
         private void SaveServerIp(string ip)
         {
+            serverHost = ip.Trim();
             try
             {
-                serverHost = ip.Trim();
                 File.WriteAllText(configPath, serverHost);
+                return;
+            }
+            catch {}
+
+            try
+            {
+                string dir = Path.GetDirectoryName(userConfigPath);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                File.WriteAllText(userConfigPath, serverHost);
             }
             catch {}
         }
@@ -190,18 +220,31 @@ namespace PrintServerPi5
             trayIcon = new NotifyIcon();
             trayIcon.Text = "Print_Server_Pi5 — HP LaserJet";
             trayIcon.ContextMenuStrip = contextMenu;
-            trayIcon.Visible = true;
 
             try
             {
                 trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             }
-            catch
+            catch {}
+
+            if (trayIcon.Icon == null)
             {
-                string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pirata.ico");
-                if (File.Exists(iconPath)) trayIcon.Icon = new Icon(iconPath);
-                else trayIcon.Icon = SystemIcons.Application;
+                try
+                {
+                    string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pirata.ico");
+                    if (File.Exists(iconPath)) trayIcon.Icon = new Icon(iconPath);
+                }
+                catch {}
             }
+
+            if (trayIcon.Icon == null)
+            {
+                trayIcon.Icon = SystemIcons.Application;
+            }
+
+            // Forzar creación del handle para permitir BeginInvoke antes de abrir el menú
+            IntPtr _ = contextMenu.Handle;
+            trayIcon.Visible = true;
 
             trayIcon.DoubleClick += (s, e) => OpenWebCups();
         }
@@ -220,7 +263,7 @@ namespace PrintServerPi5
 
         private void InitLastJobId()
         {
-            new Thread(() => {
+            Thread t = new Thread(() => {
                 try {
                     string html = FetchHttp("http://" + serverHost + ":" + serverPort + "/jobs?which_jobs=all");
                     if (!string.IsNullOrEmpty(html)) {
@@ -231,12 +274,14 @@ namespace PrintServerPi5
                         }
                     }
                 } catch {}
-            }).Start();
+            });
+            t.IsBackground = true;
+            t.Start();
         }
 
         private void CheckPrinterStatus()
         {
-            new Thread(() => {
+            Thread t = new Thread(() => {
                 try
                 {
                     string pUrl = "http://" + serverHost + ":" + serverPort + "/printers/" + queueName;
@@ -324,16 +369,19 @@ namespace PrintServerPi5
                     }
                 }
                 catch {}
-            }).Start();
+            });
+            t.IsBackground = true;
+            t.Start();
         }
 
         private void UpdateStatus(string text)
         {
-            if (statusMenuItem != null && contextMenu != null)
+            if (statusMenuItem != null && contextMenu != null && !contextMenu.IsDisposed && contextMenu.IsHandleCreated)
             {
                 contextMenu.BeginInvoke(new Action(() => {
                     statusMenuItem.Text = "● " + text;
-                    trayIcon.Text = "Print_Server_Pi5\n" + (text.Length > 50 ? text.Substring(0, 50) : text);
+                    string tip = "Print_Server_Pi5\n" + text;
+                    trayIcon.Text = tip.Length > 60 ? tip.Substring(0, 60) : tip;
                 }));
             }
         }
@@ -457,37 +505,81 @@ namespace PrintServerPi5
             }
         }
 
-        private bool IsStartupEnabled()
+        private const string RunKeyPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+
+        private bool IsRunValueSet(RegistryHive hive)
         {
             try
             {
-                using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false))
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(hive, RegistryView.Registry64))
+                using (RegistryKey rk = baseKey.OpenSubKey(RunKeyPath, false))
                 {
-                    return rk.GetValue("Print_Server_Pi5") != null;
+                    return rk != null && rk.GetValue("Print_Server_Pi5") != null;
                 }
             }
             catch { return false; }
+        }
+
+        private bool IsStartupEnabled()
+        {
+            return IsRunValueSet(RegistryHive.CurrentUser) || IsRunValueSet(RegistryHive.LocalMachine);
         }
 
         private void ToggleStartup()
         {
             try
             {
-                using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                if (IsStartupEnabled())
                 {
-                    if (IsStartupEnabled())
+                    try
                     {
-                        rk.DeleteValue("Print_Server_Pi5", false);
-                        startupMenuItem.Checked = false;
+                        using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        using (RegistryKey rk = baseKey.OpenSubKey(RunKeyPath, true))
+                        {
+                            if (rk != null) rk.DeleteValue("Print_Server_Pi5", false);
+                        }
+                    }
+                    catch {}
+
+                    if (IsRunValueSet(RegistryHive.LocalMachine))
+                    {
+                        try
+                        {
+                            using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                            using (RegistryKey rk = baseKey.OpenSubKey(RunKeyPath, true))
+                            {
+                                if (rk != null) rk.DeleteValue("Print_Server_Pi5", false);
+                            }
+                        }
+                        catch
+                        {
+                            System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo();
+                            psi.FileName = "reg.exe";
+                            psi.Arguments = "delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"Print_Server_Pi5\" /f";
+                            psi.Verb = "runas";
+                            psi.UseShellExecute = true;
+                            psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                            System.Diagnostics.Process p = System.Diagnostics.Process.Start(psi);
+                            if (p != null) p.WaitForExit(5000);
+                        }
+                    }
+
+                    startupMenuItem.Checked = IsStartupEnabled();
+                    if (!startupMenuItem.Checked)
+                    {
                         ShowNotification("Inicio con Windows", "Se ha desactivado el inicio automático.", ToolTipIcon.Info);
                     }
-                    else
+                }
+                else
+                {
+                    using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                    using (RegistryKey rk = baseKey.CreateSubKey(RunKeyPath))
                     {
                         string exePath = Application.ExecutablePath;
-                        rk.SetValue("Print_Server_Pi5", "\"" + exePath + "\"");
-                        startupMenuItem.Checked = true;
-                        ShowNotification("Inicio con Windows", "Print_Server_Pi5 se iniciará automáticamente con tu equipo.", ToolTipIcon.Info);
+                        rk.SetValue("Print_Server_Pi5", "\"" + exePath + "\" --startup");
                     }
+                    startupMenuItem.Checked = true;
+                    ShowNotification("Inicio con Windows", "Print_Server_Pi5 se iniciará automáticamente con tu equipo.", ToolTipIcon.Info);
                 }
             }
             catch (Exception ex)

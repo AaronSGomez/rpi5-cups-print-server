@@ -20,7 +20,8 @@
 
 | Recurso | Enlace Directo | Destinado a | Descripción |
 | :--- | :--- | :--- | :--- |
-| **Portal Web Interactivo (Online)** | [**aaronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: topología interactiva, buscador de drivers multimarca y manual técnico |
+| **Portal Web Interactivo (Online)** | [**aaronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: descarga directa del instalador Windows, topología interactiva, buscador de drivers y manual |
+| **Descarga Directa Windows (.exe)** | [**`INSTALAR_PRINT_SERVER_PI5.exe`**](https://aaronsgomez.github.io/rpi5-cups-print-server/downloads/INSTALAR_PRINT_SERVER_PI5.exe) | Equipos Windows 10 y 11 | Ejecutable autónomo con el servicio e icono incrustados, sin tener que buscarlo en el repositorio |
 | **Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
 | **Cliente Windows Click & Play 🏴‍☠️** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador todo-en-uno `.exe` con icono pirata, app de bandeja System Tray, avisos Toast y control de atascos |
 | **Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |
@@ -54,12 +55,12 @@ Por defecto, Windows entrega los datos a la Raspberry Pi y borra el trabajo de s
 Para resolver esto, el paquete en [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) ofrece **dos modos de uso para que el usuario elija**:
 
 * **Modo 1 (Recomendado / App con Icono Pirata 🏴‍☠️):**
-  - **`INSTALAR_PRINT_SERVER_PI5.exe`**: Instalador todo-en-uno que solicita la IP del servidor CUPS al usuario (si no existe `ip_servidor.txt`), comprueba la conexión con el puerto 631, registra la impresora y **despliega de forma permanente el software en `C:\Program Files\Print_Server_Pi5\`** (con acceso directo en el Menú Inicio y desinstalador automático).
+  - **`INSTALAR_PRINT_SERVER_PI5.exe`** *(descargable directamente desde el [portal web](https://aaronsgomez.github.io/rpi5-cups-print-server/))*: Instalador autónomo que incluye `Print_Server_Pi5.exe` y `pirata.ico` incrustados en el propio ejecutable. Solicita la IP del servidor CUPS al usuario (si no existe `ip_servidor.txt`), comprueba la conexión con el puerto 631, registra la impresora, **despliega de forma permanente el software en `C:\Program Files\Print_Server_Pi5\`** (con acceso directo en el Menú Inicio y desinstalador automático), registra el arranque automático para todos los usuarios en `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` (64 bits) e inicia el monitor en la sesión gráfica del usuario activo.
   - **`Print_Server_Pi5.exe` (App de Bandeja / System Tray junto al reloj):**
     - 🖨️ **Notificaciones Toast nativas:** Avisos emergentes en tiempo real (*"Imprimiendo..."*, *"Completado con éxito"* y alarma sonora ante atascos).
     - ⚡ **Desbloqueo de atascos en 1 clic:** Cuando la impresora se atasca y CUPS detiene la cola por software, tras retirar el papel basta con hacer clic derecho en el icono pirata > **"Desbloquear y Reanudar Impresora"** para reactivar el servicio sin abrir consolas ni comandos.
     - 🧹 **Cancelar trabajos:** Opción de purgar documentos dañados.
-    - 🔄 **Inicio automático:** Configurable con casilla de verificación.
+    - 🔄 **Inicio automático y cambio de IP:** Configurable con casilla de verificación (compatible con `HKLM` y `HKCU`) y respaldo en `%LocalAppData%\Print_Server_Pi5\ip_servidor.txt` si se edita la IP sin permisos de administrador.
 
 * **Modo 2 (Modo Ligero / Scripts por Lotes .bat y .ps1):**
   - Ubicado en la subcarpeta separada [`Scripts_Ejecucion_Manual/`](Cliente_Windows_ClickAndPlay/Scripts_Ejecucion_Manual/) para quienes no deseen aplicaciones residentes en segundo plano:
@@ -166,14 +167,14 @@ El script se encarga de instalar paquetes, configurar `/etc/cups/cupsd.conf` con
 * [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/): **Paquete Universal para Lectores.** No tiene IP prefijada; solicita la IP local de la Raspberry Pi en la primera ejecución y la guarda en `ip_servidor.txt`.
 * `Cliente_Windows_Privado/`: **Paquete Personal.** Preconfigurado con la IP fija del servidor doméstico (`192.168.1.40`) para instalación 100% desatendida.
 
-> 💡 **Autonomía y Ejecución desde Pendrives USB:**  
-> **No necesitas copiar los archivos manualmente a tu disco duro antes de instalar.** Puedes ejecutar `INSTALAR_PRINT_SERVER_PI5.exe` directamente desde una memoria USB (Pendrive), una carpeta compartida de red o tu carpeta de Descargas. El propio instalador copiará de forma autónoma y permanente todos los archivos necesarios a `C:\Program Files\Print_Server_Pi5\`, registrará el acceso directo con icono pirata en el Menú Inicio y garantizará que el servicio arranque siempre con Windows aunque retires el USB.
+> 💡 **Ejecución Autónoma (Descarga Directa Web o Pendrive USB):**  
+> **No necesitas descargar el repositorio ni copiar archivos adicionales.** Al incrustar `Print_Server_Pi5.exe` y `pirata.ico` dentro del propio ejecutable, puedes descargar solo `INSTALAR_PRINT_SERVER_PI5.exe` desde el portal web y abrirlo desde *Descargas*, un Pendrive USB o una carpeta de red. El instalador detendrá instancias previas, copiará permanentemente los archivos a `C:\Program Files\Print_Server_Pi5\`, registrará el arranque en `HKLM\...\Run` (64 bits) e iniciará el servicio de bandeja en la sesión gráfica del usuario.
 
 ### Pasos de Instalación:
-1. Abre la carpeta [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/) (o desde tu pendrive).
+1. Descarga **`INSTALAR_PRINT_SERVER_PI5.exe`** directamente desde el botón **DESCARGAR INSTALADOR (.EXE)** del [portal web](https://aaronsgomez.github.io/rpi5-cups-print-server/) o abre [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/).
 2. **Método Recomendado (Con App de Bandeja):** Haz doble clic en **`INSTALAR_PRINT_SERVER_PI5.exe`** (icono de bandera pirata 🏴‍☠️).
    - Escribe la IP de tu Raspberry Pi cuando te lo solicite.
-   - El instalador despliega los archivos en `C:\Program Files\Print_Server_Pi5\`, agrega la impresora y arranca el monitor residente junto al reloj.
+   - El instalador despliega los archivos en `C:\Program Files\Print_Server_Pi5\`, agrega la impresora, registra el inicio automático en Windows 10/11 y arranca el monitor residente junto al reloj.
 3. **Método Ligero (Solo Scripts sin instalar software):** Entra en la subcarpeta `Scripts_Ejecucion_Manual/` y ejecuta **`INSTALAR_IMPRESORA.bat`**.
 
 | Monitorización en Segundo Plano | Captura de Servicio & Cola CUPS |
@@ -244,8 +245,10 @@ server_print/
 │   └── GUIA_IMPRESION_MOVIL.md                # Guía paso a paso para móviles Android e iOS / AirPrint
 │
 ├── portal_web/                                # Portal web interactivo y manual en línea
-│   ├── index.html                             # Página principal con emulador y topología
+│   ├── index.html                             # Página principal con emulador, descarga y topología
 │   ├── css/styles.css                         # Estilos visuales editorial suizo-industrial
+│   ├── downloads/                             # Binarios servidos directamente desde GitHub Pages
+│   │   └── INSTALAR_PRINT_SERVER_PI5.exe      # Instalador autónomo descargable desde la web
 │   └── js/                                    # Lógica interactiva y catálogo de drivers
 │
 ├── setup_cups_server.sh                       # Script Bash modular de despliegue en Raspberry Pi 5

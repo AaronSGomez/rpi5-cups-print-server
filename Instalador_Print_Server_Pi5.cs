@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -129,6 +130,9 @@ namespace PrintServerInstaller
             Console.WriteLine("[*] Instalando archivos en el disco duro del PC...");
             Console.ResetColor();
 
+            // Detener cualquier instancia previa antes de copiar/sobrescribir ejecutables
+            StopExistingService();
+
             string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             string targetDir = Path.Combine(programFiles, "Print_Server_Pi5");
             try
@@ -144,10 +148,25 @@ namespace PrintServerInstaller
                     if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
                 }
 
-                // Copiar binarios principales
-                CopyFileIfExists(Path.Combine(currentDir, "Print_Server_Pi5.exe"), Path.Combine(targetDir, "Print_Server_Pi5.exe"));
-                CopyFileIfExists(Path.Combine(currentDir, "pirata.ico"), Path.Combine(targetDir, "pirata.ico"));
+                // Desplegar binarios principales (desde recurso incrustado o desde carpeta actual)
+                DeployBundledFile("Print_Server_Pi5.exe", Path.Combine(currentDir, "Print_Server_Pi5.exe"), Path.Combine(targetDir, "Print_Server_Pi5.exe"));
+                DeployBundledFile("pirata.ico", Path.Combine(currentDir, "pirata.ico"), Path.Combine(targetDir, "pirata.ico"));
                 File.WriteAllText(Path.Combine(targetDir, "ip_servidor.txt"), serverHost);
+
+                // Limpiar posible override antiguo en LocalAppData si existiera para usar la IP recién instalada
+                try
+                {
+                    string userOverride = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "Print_Server_Pi5",
+                        "ip_servidor.txt"
+                    );
+                    if (File.Exists(userOverride) && !string.Equals(Path.GetFullPath(userOverride), Path.GetFullPath(Path.Combine(targetDir, "ip_servidor.txt")), StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.WriteAllText(userOverride, serverHost);
+                    }
+                }
+                catch {}
 
                 // Copiar scripts de ejecución manual si existen
                 string manualSrc = Path.Combine(currentDir, "Scripts_Ejecucion_Manual");
@@ -172,7 +191,8 @@ namespace PrintServerInstaller
                     ")\r\n" +
                     "echo [*] Deteniendo servicio...\r\n" +
                     "taskkill /f /im Print_Server_Pi5.exe >nul 2>&1\r\n" +
-                    "reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"Print_Server_Pi5\" /f >nul 2>&1\r\n" +
+                    "reg delete \"HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"Print_Server_Pi5\" /f >nul 2>&1\r\n" +
+                    "reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\" /v \"Print_Server_Pi5\" /f /reg:64 >nul 2>&1\r\n" +
                     "echo [*] Retirando impresora...\r\n" +
                     "powershell -NoProfile -Command \"Remove-Printer -Name 'HP LaserJet M14-M17 (Red Hogar)' -ErrorAction SilentlyContinue\"\r\n" +
                     "del \"%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Print_Server_Pi5.lnk\" >nul 2>&1\r\n" +
@@ -246,35 +266,127 @@ namespace PrintServerInstaller
             Console.ResetColor();
 
             string targetTrayExe = Path.Combine(targetDir, "Print_Server_Pi5.exe");
+            bool startupConfigured = false;
+            bool serviceStarted = false;
+
             if (File.Exists(targetTrayExe))
             {
+                // 6a. Registrar inicio automático para todos los usuarios en HKLM (vista 64 bits)
                 try
                 {
-                    using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                    using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                    using (RegistryKey rk = baseKey.CreateSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"))
                     {
-                        rk.SetValue("Print_Server_Pi5", "\"" + targetTrayExe + "\"");
+                        rk.SetValue("Print_Server_Pi5", "\"" + targetTrayExe + "\" --startup");
+                        startupConfigured = true;
                     }
 
-                    // Detener cualquier instancia previa si existiera
-                    foreach (Process p in Process.GetProcessesByName("Print_Server_Pi5"))
+                    // Limpiar posible duplicado en HKCU
+                    try
                     {
-                        try { p.Kill(); } catch {}
+                        using (RegistryKey hkcuBase = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        using (RegistryKey hkcuRun = hkcuBase.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                        {
+                            if (hkcuRun != null) hkcuRun.DeleteValue("Print_Server_Pi5", false);
+                        }
                     }
+                    catch {}
+                }
+                catch
+                {
+                    try
+                    {
+                        using (RegistryKey hkcuBase = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        using (RegistryKey rk = hkcuBase.CreateSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"))
+                        {
+                            rk.SetValue("Print_Server_Pi5", "\"" + targetTrayExe + "\" --startup");
+                            startupConfigured = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("[!] No se pudo registrar el inicio automático: " + ex.Message);
+                        Console.ResetColor();
+                    }
+                }
 
-                    // Iniciar el monitor desde su ubicación permanente
+                if (startupConfigured)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("[OK] Inicio automático con Windows registrado correctamente.");
+                    Console.ResetColor();
+                }
+
+                // 6b. Asegurar que no quede ninguna instancia previa y lanzar en la sesión de usuario
+                StopExistingService();
+
+                try
+                {
+                    // Lanzar mediante explorer.exe para que corra sin elevación en la sesión gráfica del usuario activo
                     Process.Start(new ProcessStartInfo() {
-                        FileName = targetTrayExe,
-                        WorkingDirectory = targetDir
+                        FileName = "explorer.exe",
+                        Arguments = "\"" + targetTrayExe + "\"",
+                        UseShellExecute = true
                     });
+                    for (int i = 0; i < 8; i++)
+                    {
+                        Thread.Sleep(250);
+                        if (Process.GetProcessesByName("Print_Server_Pi5").Length > 0)
+                        {
+                            serviceStarted = true;
+                            break;
+                        }
+                    }
+                }
+                catch {}
 
+                if (!serviceStarted)
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo() {
+                            FileName = targetTrayExe,
+                            Arguments = "--startup",
+                            WorkingDirectory = targetDir,
+                            UseShellExecute = true
+                        });
+                        for (int i = 0; i < 6; i++)
+                        {
+                            Thread.Sleep(250);
+                            if (Process.GetProcessesByName("Print_Server_Pi5").Length > 0)
+                            {
+                                serviceStarted = true;
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("[!] Nota sobre inicio de servicio: " + ex.Message);
+                        Console.ResetColor();
+                    }
+                }
+
+                if (serviceStarted)
+                {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("[OK] Print_Server_Pi5 iniciado en segundo plano junto al reloj.");
                     Console.ResetColor();
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine("[!] Nota sobre inicio de servicio: " + ex.Message);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("[!] No se pudo confirmar el arranque automático de Print_Server_Pi5. Puedes abrirlo desde el Menú Inicio.");
+                    Console.ResetColor();
                 }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("[X] ERROR: No se encontró Print_Server_Pi5.exe para instalar el servicio de bandeja.");
+                Console.ResetColor();
             }
 
             Console.WriteLine();
@@ -326,6 +438,41 @@ namespace PrintServerInstaller
                 }
             }
             catch { return false; }
+        }
+
+        static void StopExistingService()
+        {
+            foreach (Process p in Process.GetProcessesByName("Print_Server_Pi5"))
+            {
+                try
+                {
+                    p.Kill();
+                    p.WaitForExit(3000);
+                }
+                catch {}
+            }
+        }
+
+        static void DeployBundledFile(string resourceName, string fallbackSrcPath, string dstPath)
+        {
+            try
+            {
+                Assembly asm = Assembly.GetExecutingAssembly();
+                using (Stream resStream = asm.GetManifestResourceStream(resourceName))
+                {
+                    if (resStream != null)
+                    {
+                        using (FileStream fs = new FileStream(dstPath, FileMode.Create, FileAccess.Write))
+                        {
+                            resStream.CopyTo(fs);
+                        }
+                        return;
+                    }
+                }
+            }
+            catch {}
+
+            CopyFileIfExists(fallbackSrcPath, dstPath);
         }
 
         static void CopyFileIfExists(string src, string dst)
