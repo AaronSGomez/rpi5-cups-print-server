@@ -23,6 +23,7 @@
 | **Portal Web Interactivo (Online)** | [**aaronsgomez.github.io/rpi5-cups-print-server**](https://aaronsgomez.github.io/rpi5-cups-print-server/) | Administradores y Usuarios | Web en vivo: descarga directa del instalador Windows, topología interactiva, buscador de drivers y manual |
 | **Descarga Directa Windows (.exe)** | [**`INSTALAR_PRINT_SERVER_PI5.exe`**](https://aaronsgomez.github.io/rpi5-cups-print-server/downloads/INSTALAR_PRINT_SERVER_PI5.exe) | Equipos Windows 10 y 11 | Ejecutable autónomo con el servicio e icono incrustados, sin tener que buscarlo en el repositorio |
 | **Guía de Impresión Móvil** | [**`docs/GUIA_IMPRESION_MOVIL.md`**](docs/GUIA_IMPRESION_MOVIL.md) | Teléfonos Android & iPhone/iPad | Paso a paso para imprimir desde WhatsApp, PDFs, Chrome y Gmail con Zero-Config o IP directa |
+| **Auditoría & SmartScreen Windows** | [**`docs/AUDITORIA_SEGURIDAD_WINDOWS.md`**](docs/AUDITORIA_SEGURIDAD_WINDOWS.md) | Usuarios Windows 10 y 11 | Qué ejecuta el instalador, verificación SHA-256 y guía para aceptar el aviso de SmartScreen |
 | **Cliente Windows Click & Play 🏴‍☠️** | [`Cliente_Windows_ClickAndPlay/`](Cliente_Windows_ClickAndPlay/) | Equipos Windows 10 y 11 | Instalador todo-en-uno `.exe` con icono pirata, app de bandeja System Tray, avisos Toast y control de atascos |
 | **Despliegue del Servidor** | [`setup_cups_server.sh`](setup_cups_server.sh) | Raspberry Pi 5 (Debian 13) | Script Bash modular, deshabilitador de `ipp-usb`, Udev anti-sleep y autoconfiguración CUPS |
 | **CLI de Control Remoto** | [`deploy_remote.py`](deploy_remote.py) | PC Administrador | Monitoreo de salud (`--status`), reconfiguración (`--fix-ppd`) y páginas de prueba remotas |
@@ -172,6 +173,7 @@ El script se encarga de instalar paquetes, configurar `/etc/cups/cupsd.conf` con
 ### Pasos de Instalación:
 1. Descarga **`INSTALAR_PRINT_SERVER_PI5.exe`** directamente desde el botón **DESCARGAR INSTALADOR (.EXE)** del [portal web](https://aaronsgomez.github.io/rpi5-cups-print-server/) o abre [`Cliente_Windows_ClickAndPlay`](Cliente_Windows_ClickAndPlay/).
 2. **Método Recomendado (Con App de Bandeja):** Haz doble clic en **`INSTALAR_PRINT_SERVER_PI5.exe`** (icono de bandera pirata 🏴‍☠️).
+   - Al no estar firmado con un certificado comercial de pago, Windows mostrará la alerta SmartScreen (*"Windows protegió su PC"*): pulsa **Más información > Ejecutar de todas formas** y acepta el aviso de Administrador (UAC). Consulta [**`docs/AUDITORIA_SEGURIDAD_WINDOWS.md`**](docs/AUDITORIA_SEGURIDAD_WINDOWS.md) para ver la auditoría completa de todo lo que ejecuta y su hash SHA-256.
    - Escribe la IP de tu Raspberry Pi cuando te lo solicite.
    - El instalador despliega los archivos en `C:\Program Files\Print_Server_Pi5\`, agrega la impresora, registra el inicio automático en Windows 10/11 y arranca el monitor residente junto al reloj.
 3. **Método Ligero (Solo Scripts sin instalar software):** Entra en la subcarpeta `Scripts_Ejecucion_Manual/` y ejecuta **`INSTALAR_IMPRESORA.bat`**.
@@ -241,6 +243,7 @@ server_print/
 ├── pirata.ico                                 # Icono pirata multirresolución de Windows
 │
 ├── docs/                                      # Manuales y guías detalladas para usuarios
+│   ├── AUDITORIA_SEGURIDAD_WINDOWS.md         # Auditoría técnica del instalador, SHA-256 y guía SmartScreen
 │   └── GUIA_IMPRESION_MOVIL.md                # Guía paso a paso para móviles Android e iOS / AirPrint
 │
 ├── portal_web/                                # Portal web interactivo y manual en línea
